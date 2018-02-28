@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/drawer_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    >
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="invisible">
+    <cn.robotpen.views.widget.WhiteBoardView
+        android:id="@+id/whiteBoardView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        />
+    </FrameLayout>
+    <include
+        layout="@layout/activity_main_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+</RelativeLayout>

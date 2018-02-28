@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:id="@+id/id_pop_layout"
+        android:layout_width="@dimen/popmenu_width"
+        android:layout_height="@dimen/popmenu_height"
+        >
+
+        <ImageView
+            android:id="@+id/menu_share"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_alignParentRight="true"
+            android:background="@drawable/popmenu_action_selector"
+            android:scaleType="center"
+            android:src="@drawable/menu_share" />
+
+        <ImageView
+            android:id="@+id/menu_rename"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_marginLeft="25dp"
+            android:layout_marginTop="25dp"
+            android:background="@drawable/popmenu_action_selector"
+            android:scaleType="center"
+            android:src="@drawable/menu_rename" />
+
+        <ImageView
+            android:id="@+id/menu_delete"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_alignParentBottom="true"
+            android:background="@drawable/popmenu_action_selector"
+            android:scaleType="center"
+            android:src="@drawable/menu_delete" />
+    </RelativeLayout>
+</LinearLayout>

@@ -1,0 +1,70 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="actionBarStyle">@style/AppThemeActionBar</item>
+        <item name="buttonStyle">@style/AppThemeButtonStyle</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <!--<item name="android:windowFullscreen">true</item>-->
+        <item name="homeAsUpIndicator">@drawable/toolbar_back_black</item>
+    </style>
+
+    <style name="AppSettingsTheme" parent="AppTheme">
+        <item name="android:textViewStyle">@style/AppSettingsTextStyle</item>
+    </style>
+
+    <style name="AppSettingsTextStyle">
+        <item name="android:textColor">#bb222222</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:layout_height">@dimen/settings_text_height</item>
+        <item name="android:minHeight">@dimen/settings_text_height</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:background">?selectableItemBackground</item>
+        <item name="android:paddingLeft">@dimen/settings_text_padding</item>
+        <item name="android:paddingRight">@dimen/settings_text_padding</item>
+    </style>
+
+    <style name="AppThemeActionBar" parent="ThemeOverlay.AppCompat.ActionBar">
+        <item name="background">@drawable/toolbar_back_bg</item>
+        <item name="android:titleTextColor">@color/titleTextColor</item>
+        <item name="android:elevation">4dp</item>
+    </style>
+
+    <style name="AppThemeButtonStyle">
+        <item name="android:background">@drawable/btn_bg</item>
+        <item name="android:textAppearance">?android:attr/textAppearanceButton</item>
+        <item name="android:minHeight">48dip</item>
+        <item name="android:minWidth">88dip</item>
+        <item name="android:focusable">true</item>
+        <item name="android:clickable">true</item>
+        <item name="android:gravity">center_vertical|center_horizontal</item>
+    </style>
+
+    <style name="AppTheme.NoActionBar" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="windowActionBar">false</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="windowNoTitle">true</item>
+        <item name="buttonStyle">@style/AppThemeButtonStyle</item>
+        <!--<item name="android:windowFullscreen">true</item>-->
+    </style>
+
+    <style name="AppTheme.Navi" parent="AppTheme.NoActionBar">
+        <item name="colorPrimary">@android:color/white</item>
+        <item name="colorPrimaryDark">@android:color/white</item>
+    </style>
+
+
+    <style name="AppBarOverlay" parent="ThemeOverlay.AppCompat.ActionBar" />
+
+    <style name="PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+
+</resources>

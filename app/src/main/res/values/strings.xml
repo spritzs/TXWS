@@ -1,0 +1,27 @@
+<resources>
+    <string name="app_name">天下文枢</string>
+    <string name="app_com"></string>
+    <string name="title_activity_white_board">WhiteBoardActivity</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="bluetooth">进行蓝牙连接</string>
+    <string name="settings">设置</string>
+    <string name="connect_status_uncon">未连接设备</string>
+    <string name="device_update">设备升级</string>
+    <string name="sync_button">同步笔记</string>
+    <string name="scan_button">扫描设备</string>
+    <string name="uncon_device_button">断开设备</string>
+    <string name="settings_about">关于</string>
+    <string name="navi_text_1">Copyright©2018</string>
+    <string name="navi_text_2">深圳市联合友创智能科技有限公司</string>
+    <string name="navi_text_3">隐私政策和使用条款</string>
+    <string name="no_name_device">未命名设备</string>
+    <string name="no_connect">未连接</string>
+    <string name="colorpixel_dialog_title">画笔颜色大小选择</string>
+    <string name="earser_dialog_title">橡皮大小选择</string>
+    <string name="tool_pen_pixels">画笔大小：</string>
+    <string name="tool_earser_pixels">橡皮大小：</string>
+    <string name="grid_empty">请新建画板</string>
+    <string name="share_title">画板分享</string>
+    <string name="rename">重命名</string>
+</resources>

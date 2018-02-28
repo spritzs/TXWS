@@ -1,0 +1,17 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.example.administrator.myapplication.MainActivity">
+    <item
+        android:id="@+id/bluetooth_settings"
+        android:orderInCategory="100"
+        android:title="@string/bluetooth"
+        android:icon="@drawable/ic_settings_bluetooth_alpha"
+        />
+    <item
+        android:id="@+id/about_settings"
+        android:orderInCategory="100"
+        android:title="@string/settings_about"
+        android:icon="@drawable/ic_settings_about_alpha"
+         />
+</menu>

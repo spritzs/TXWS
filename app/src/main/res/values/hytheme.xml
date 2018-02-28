@@ -1,0 +1,113 @@
+<resources>
+
+    <!--<style name="Theme.HyAppThemeNoActionBar" parent="@android:style/Theme.Material.NoActionBar">-->
+        <!--<item name="android:colorPrimary">@color/hy_colorPrimary</item>                     &lt;!&ndash;顶部actionbar颜色&ndash;&gt;-->
+        <!--<item name="android:colorPrimaryDark">@color/hy_colorPrimaryDark</item>             &lt;!&ndash;顶部statusbar颜色&ndash;&gt;-->
+        <!--<item name="android:colorAccent">@color/hy_colorAccent</item>                       &lt;!&ndash; 控件颜色&ndash;&gt;-->
+        <!--<item name="android:windowBackground">@color/hy_colorBg</item>                      &lt;!&ndash;默认背景颜色&ndash;&gt;-->
+        <!--<item name="android:listViewStyle">@style/HyListViewStyle</item>                 &lt;!&ndash;默认listview样式&ndash;&gt;-->
+        <!--<item name="android:popupMenuStyle">@style/HyPopupMenuStyle</item>               &lt;!&ndash;popupMenu样式&ndash;&gt;-->
+        <!--<item name="android:alertDialogTheme">@style/HyDialogTheme</item>                &lt;!&ndash;alertDialog样式&ndash;&gt;-->
+        <!--<item name="android:listDivider">@drawable/dividers</item>                       &lt;!&ndash;分割线样式&ndash;&gt;-->
+        <!--&lt;!&ndash;<item name="android:textAppearanceMedium">@style/TextAppearance.AppCompat.Medium</item>&ndash;&gt;-->
+        <!--<item name="android:homeAsUpIndicator">@drawable/hy_back</item>                  &lt;!&ndash;左上角返回样式&ndash;&gt;-->
+        <!--<item name="android:spinnerItemStyle">@style/HySpinnerItem</item>-->
+    <!--</style>-->
+
+
+   <!-- <style name="Theme.HyAppTheme.Appcompat" parent="Theme.AppCompat">
+        <item name="colorPrimary">@color/hy_colorPrimary</item>                     &lt;!&ndash;顶部actionbar颜色&ndash;&gt;
+        <item name="colorPrimaryDark">@color/hy_colorPrimaryDark</item>             &lt;!&ndash;顶部statusbar颜色&ndash;&gt;
+        <item name="colorAccent">@color/hy_colorAccent</item>                       &lt;!&ndash; 控件颜色&ndash;&gt;
+        <item name="android:windowBackground">@color/hy_colorBg</item>                      &lt;!&ndash;默认背景颜色&ndash;&gt;
+        <item name="android:listViewStyle">@style/HyListViewStyle</item>                 &lt;!&ndash;默认listview样式&ndash;&gt;
+        <item name="android:popupMenuStyle">@style/HyPopupMenuStyle</item>               &lt;!&ndash;popupMenu样式&ndash;&gt;
+        <item name="android:alertDialogTheme">@style/HyDialogTheme</item>                &lt;!&ndash;alertDialog样式&ndash;&gt;
+        <item name="android:listDivider">@drawable/dividers</item>                       &lt;!&ndash;分割线样式&ndash;&gt;
+        &lt;!&ndash;<item name="android:textAppearanceMedium">@style/TextAppearance.AppCompat.Medium</item>&ndash;&gt;
+        <item name="actionBarStyle">@style/HyActionBarStyle</item>               &lt;!&ndash;顶部actionbar字体颜色和背景颜色&ndash;&gt;
+        <item name="android:actionOverflowButtonStyle">@style/HyOverflow</item>          &lt;!&ndash;右上角三点样式&ndash;&gt;
+        <item name="homeAsUpIndicator">@drawable/hy_back</item>                  &lt;!&ndash;左上角返回样式&ndash;&gt;
+        <item name="android:spinnerItemStyle">@style/HySpinnerItem</item>
+        <item name="android:toolbarStyle">@style/HyToolBar</item>
+    </style>-->
+
+
+
+    <!--<style name="Theme.HyAppTheme" parent="@android:style/Theme.Material">-->
+        <!--<item name="android:colorPrimary">@color/hy_colorPrimary</item>                     &lt;!&ndash;顶部actionbar颜色&ndash;&gt;-->
+        <!--<item name="android:colorPrimaryDark">@color/hy_colorPrimaryDark</item>             &lt;!&ndash;顶部statusbar颜色&ndash;&gt;-->
+        <!--<item name="android:colorAccent">@color/hy_colorAccent</item>                       &lt;!&ndash; 控件颜色&ndash;&gt;-->
+        <!--<item name="android:windowBackground">@color/hy_colorBg</item>                      &lt;!&ndash;默认背景颜色&ndash;&gt;-->
+        <!--<item name="android:listViewStyle">@style/HyListViewStyle</item>                 &lt;!&ndash;默认listview样式&ndash;&gt;-->
+        <!--<item name="android:popupMenuStyle">@style/HyPopupMenuStyle</item>               &lt;!&ndash;popupMenu样式&ndash;&gt;-->
+        <!--<item name="android:alertDialogTheme">@style/HyDialogTheme</item>                &lt;!&ndash;alertDialog样式&ndash;&gt;-->
+        <!--<item name="android:listDivider">@drawable/dividers</item>                       &lt;!&ndash;分割线样式&ndash;&gt;-->
+        <!--&lt;!&ndash;<item name="android:textAppearanceMedium">@style/TextAppearance.AppCompat.Medium</item>&ndash;&gt;-->
+        <!--<item name="android:actionBarStyle">@style/HyActionBarStyle</item>               &lt;!&ndash;顶部actionbar字体颜色和背景颜色&ndash;&gt;-->
+        <!--<item name="android:actionOverflowButtonStyle">@style/HyOverflow</item>          &lt;!&ndash;右上角三点样式&ndash;&gt;-->
+        <!--<item name="android:homeAsUpIndicator">@drawable/hy_back</item>                  &lt;!&ndash;左上角返回样式&ndash;&gt;-->
+        <!--<item name="android:spinnerItemStyle">@style/HySpinnerItem</item>-->
+        <!--<item name="android:toolbarStyle">@style/HyToolBar</item>-->
+        <!--<item name="android:actionModeBackground">@drawable/hy_actionbar_bg</item>-->
+    <!--</style>-->
+
+
+    <!--<style name="HyToolBarTitleButton" parent="@android:style/Widget.Material.Toolbar.Button.Navigation"></style>-->
+
+    <!--<style name="HyToolBarTitle" parent="@android:style/TextAppearance.Material.Widget.Toolbar.Title">-->
+        <!--<item name="android:textColor">@color/hy_colorAccent</item>-->
+    <!--</style>-->
+
+    <!--<style name="HyToolBarSubtitle" parent="@android:style/TextAppearance.Material.Widget.Toolbar.Subtitle">-->
+        <!--<item name="android:textColor">@color/hy_colorAccent</item>-->
+    <!--</style>-->
+    <!--<style name="HyToolBar" parent="@android:style/Widget.Material.Toolbar">-->
+        <!--&lt;!&ndash;<item name="navigationButtonStyle">@style/Widget.Material.Toolbar.Button.Navigation</item>&ndash;&gt;-->
+        <!--<item name="android:titleTextAppearance">@style/HyToolBarTitle</item>-->
+        <!--<item name="android:subtitleTextAppearance">@style/HyToolBarSubtitle</item>-->
+        <!--<item name="android:background">@drawable/hy_actionbar_bg</item>-->
+    <!--</style>-->
+
+
+    <!--<style name="HySpinnerItem" parent="@android:style/Widget.TextView.SpinnerItem">-->
+        <!--<item name="android:textAppearance">@style/Hy.TextView.SpinnerItem</item>-->
+    <!--</style>-->
+
+    <!--<style name="Hy.TextView.SpinnerItem" parent="@android:style/TextAppearance.Material.Widget.TextView.SpinnerItem">-->
+
+    <!--</style>-->
+
+
+    <!--<style name="HyOverflow" parent="@android:style/Widget.Material.ActionButton.Overflow">-->
+        <!--<item name="android:src">@drawable/hy_more</item>-->
+    <!--</style>-->
+
+
+    <!--<style name="HyActionBarStyle" parent="@android:style/Widget.Material.ActionBar.Solid">-->
+        <!--<item name="android:titleTextStyle">@style/HyTitleStyle</item>-->
+        <!--<item name="android:colorPrimary">@color/hy_colorPrimary</item>-->
+        <!--<item name="android:background">@drawable/hy_actionbar_bg</item>-->
+    <!--</style>-->
+
+    <!--<style name="HyTitleStyle" parent="@android:style/TextAppearance.Material.Widget.ActionBar.Title">-->
+        <!--<item name="android:textSize">20sp</item>-->
+        <!--<item name="android:textColor">@color/hy_colorAccent</item>-->
+    <!--</style>-->
+
+    <!--<style name="HyListViewStyle" parent="@android:style/Widget.Material.ListView">-->
+        <!--<item name="android:listDivider">@drawable/dividers</item>-->
+        <!--<item name="android:background">@color/hy_colorBg</item>-->
+    <!--</style>-->
+
+
+    <!--<style name="HyPopupMenuStyle" parent="@android:style/Widget.Material.PopupMenu">-->
+    <!--</style>-->
+    <!--<style name="HyDialogTheme" parent="@android:style/Theme.Material.Dialog.Alert">-->
+        <!--&lt;!&ndash;<item name="android:textAppearanceListItem">@style/HyTextAppearanceListItem</item>&ndash;&gt;-->
+        <!--<item name="android:colorAccent">@color/hy_colorAccent</item>-->
+    <!--</style>-->
+    <!--<style name="HyTextAppearanceListItem" parent="@android:style/TextAppearance.Material.Subhead">-->
+        <!--<item name="android:textColor">?android:textColorPrimary</item>-->
+    <!--</style>-->
+</resources>

@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:id="@+id/viewWindow"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
+
+        <cn.robotpen.record.widget.RecordBoardView
+            android:id="@+id/recordBoardView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </RelativeLayout>
+
+
+    <LinearLayout
+        android:id="@+id/more_tool_parentlayout"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/more_tool_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#eeeeeeee"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp">
+
+
+            <ImageView
+                android:id="@+id/toolbar_pen"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:scaleType="center"
+                android:src="@drawable/tool_pen1a_layer" />
+
+            <ImageView
+                android:id="@+id/toolbar_color_px"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:scaleType="center"
+                android:src="@drawable/tool_t_black_layer" />
+
+            <ImageView
+                android:id="@+id/tool_bg"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:scaleType="center"
+                android:src="@drawable/tool_change_bg_layer" />
+
+            <ImageView
+                android:id="@+id/tool_handorpen"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:scaleType="center"
+                android:src="@drawable/tool_usehand_layer" />
+
+            <ImageView
+                android:id="@+id/tool_recorder_record"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:scaleType="center"
+                android:src="@drawable/tool_record_layer" />
+
+            <ImageView
+                android:id="@+id/tool_comfirm"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:scaleType="center"
+                android:src="@drawable/tool_video_stop_selector" />
+
+            <ImageView
+                android:id="@+id/tool_cancel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:scaleType="center"
+                android:src="@drawable/tool_cancel_selector" />
+
+        </LinearLayout>
+    </LinearLayout>
+
+</RelativeLayout>

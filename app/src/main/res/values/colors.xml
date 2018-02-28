@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#ffffff</color>
+    <color name="colorPrimaryDark">#ffffff</color>
+    <color name="colorAccent">#40b3f4</color>
+    <color name="colorGray">#bbbbbb</color>
+    <color name="textSecond">#444444</color>
+    <color name="colorFloat">#50505b</color>
+    <color name="textColor">#222222</color>
+    <color name="titleTextColor">#bb000000</color>
+    <color name="menuTextColor">#5f6379</color>
+    <color name="divider">#99555555</color>
+    <color name="note_bg_color">#f4f1e8</color>
+</resources>

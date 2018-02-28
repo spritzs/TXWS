@@ -1,0 +1,19 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.example.administrator.myapplication.MainActivity">
+    <item
+        android:id="@+id/bluetooth_settings"
+        android:orderInCategory="100"
+        android:title="@string/bluetooth"
+        app:showAsAction="always"
+        android:icon="@drawable/ic_toolbar_bluetooth"
+        />
+    <item
+        android:id="@+id/sync_settings"
+        android:orderInCategory="100"
+        app:showAsAction="always"
+        android:title="@string/sync_button"
+        android:icon="@drawable/ic_toolbar_sync"
+         />
+</menu>
