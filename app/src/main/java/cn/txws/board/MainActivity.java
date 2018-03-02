@@ -20,17 +20,19 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 
+import java.util.List;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import cn.robotpen.model.entity.note.NoteEntity;
 import cn.robotpen.model.symbol.DeviceType;
 import cn.robotpen.pen.callback.RobotPenActivity;
-import cn.robotpen.pen.model.RemoteState;
-import cn.robotpen.pen.model.RobotDevice;
 import cn.robotpen.utils.log.CLog;
 import cn.robotpen.views.module.TrailsManageModule;
 import cn.robotpen.views.widget.WhiteBoardView;
@@ -44,9 +46,8 @@ import cn.txws.board.database.binding.Binding;
 import cn.txws.board.database.binding.BindingBase;
 import cn.txws.board.database.data.BlockLoaderData;
 import cn.txws.board.show.BoardPopupMenu;
+import cn.txws.board.show.NewRecordBoardActivity;
 import cn.txws.board.show.RecordBoardActivity;
-import cn.txws.board.show.WhiteBoardActivity;
-import cn.txws.board.show.WhiteBoardWithMethodActivity;
 import cn.txws.board.util.AppUtil;
 
 public class MainActivity extends RobotPenActivity implements BlockLoaderData.BlockLoaderDataListener, WhiteBoardInterface {
@@ -55,13 +56,20 @@ public class MainActivity extends RobotPenActivity implements BlockLoaderData.Bl
     RelativeLayout activityMain;
     @BindView(R.id.grid_recycler)
     RecyclerView mGridView;
-//    @BindView(R.id.whiteBoardView)
-//    WhiteBoardView mWhiteBoardView;
     @BindView(R.id.text)
     TextView nullText;
+    TextView allText;
+    ImageView backSettingImg,bluetoothImg,syncImg;
+    View bottomLayout;
+    FloatingActionButton mFab;
+    @BindView(R.id.bottom_delete)
+    TextView bottomDelete;
+    @BindView(R.id.bottom_share)
+    TextView bottomShare;
+    @BindView(R.id.bottom_merge)
+    TextView bottomMerge;
 
     public final static String EXTRA_BLOCKID = "EXTRA_BLOCKID";
-    public final static String EXTRA_ISNEW = "extra_isnew";
     public final static String ACTION_DELBOARD = "action_delboard";
     DelBroadcastReceiver mDelBroadcastReceiver;
     IntentFilter mIntentFilter;
@@ -85,12 +93,12 @@ public class MainActivity extends RobotPenActivity implements BlockLoaderData.Bl
         ResUtils.isDirectory(ResUtils.DIR_NAME_PHOTO);
         ResUtils.isDirectory(ResUtils.DIR_NAME_VIDEO);
         ButterKnife.bind(this);
-//        mWhiteBoardView.setIsTouchWrite(false);//默认用手输入
-//        mWhiteBoardView.setDaoSession(MyApplication.getInstance().getDaoSession());
         mTrailsManageModule=new TrailsManageModule(this,MyApplication.getInstance().getDaoSession());
-
         this.mTrailsManageModule.setTitle(getNewNoteName()).setIsHorizontal(getIsHorizontal()).setDeviceType(getDeviceType()).setUserId(getCurrUserId()).setup(getNoteKey()).initBlock(null).asyncSave(true);
-//        mWhiteBoardView.setLoadIgnorePhoto(false);
+        init();
+    }
+
+    private void init() {
         GridLayoutManager mgr = new GridLayoutManager(this, 2);
         mGridView.setLayoutManager(mgr);
         mGridView.setItemAnimator(new DefaultItemAnimator());
@@ -107,8 +115,128 @@ public class MainActivity extends RobotPenActivity implements BlockLoaderData.Bl
 
         });
         mGridAdapter.setOnItemClickListner(itemClickListener);
+
+        mGridAdapter.setOnLongClickListener(new GridViewAdapter.OnLongClickListener() {
+            @Override
+            public void onLongClick() {
+                if(mGridAdapter!=null&&!mGridAdapter.getIsSelectorMode()) {
+                    setSelectorMode(true);
+                }
+            }
+        });
+
         showEmpty(true);
-        init();
+
+
+        getSupportActionBar().setDisplayShowCustomEnabled(true); //Enable自定义的View
+        View customBar = LayoutInflater.from(this).inflate(R.layout.toolbar_layout, null);
+        backSettingImg= (ImageView) customBar.findViewById(R.id.toolbar_settings);
+        backSettingImg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(mGridAdapter!=null&&mGridAdapter.getIsSelectorMode()){
+                    setSelectorMode(false);
+                }else{
+                    gotoSettingsActivity();
+                }
+            }
+        });
+        bluetoothImg= (ImageView) customBar.findViewById(R.id.toolbar_bluetooth);
+        bluetoothImg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                connectBlueTooth();
+            }
+        });
+        syncImg= (ImageView) customBar.findViewById(R.id.toolbar_sync);
+        syncImg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                syncOffLine();
+            }
+        });
+        allText= (TextView) customBar.findViewById(R.id.toolbar_allpick);
+        allText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mGridAdapter.allPickOrUnPick(allText);
+            }
+        });
+        getSupportActionBar().setCustomView(customBar);
+        mFab = (FloatingActionButton) findViewById(R.id.fab);
+        mFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                gotoNewRecordBoardActivity();
+            }
+        });
+        bottomLayout=findViewById(R.id.bottom_layout);
+
+        mDelBroadcastReceiver = new DelBroadcastReceiver();
+        mIntentFilter = new IntentFilter();
+        mIntentFilter.addAction(ACTION_DELBOARD);
+        setupActionBar();
+    }
+
+    public void setSelectorMode(boolean selectMode){
+        mGridAdapter.setSelectorMode(selectMode);
+        setupActionBar();
+    }
+
+
+    public void setupActionBar(){
+        if(mGridAdapter!=null&&mGridAdapter.getIsSelectorMode()){
+            backSettingImg.setImageResource(R.drawable.toolbar_back_black);
+            allText.setVisibility(View.VISIBLE);
+            bluetoothImg.setVisibility(View.INVISIBLE);
+            syncImg.setVisibility(View.INVISIBLE);
+            mFab.setVisibility(View.INVISIBLE);
+            bottomLayout.setVisibility(View.VISIBLE);
+        }else{
+            backSettingImg.setImageResource(R.drawable.ic_toolbar_quicksettings);
+            allText.setVisibility(View.INVISIBLE);
+            bluetoothImg.setVisibility(View.VISIBLE);
+            syncImg.setVisibility(View.VISIBLE);
+            mFab.setVisibility(View.VISIBLE);
+            bottomLayout.setVisibility(View.GONE);
+        }
+    }
+
+
+    private void refreshBottomLayout() {
+        List<String> mList=mGridAdapter.getSelectorList();
+        if(mList.size()==0){
+            bottomDelete.setClickable(false);
+            bottomDelete.setEnabled(false);
+            bottomShare.setClickable(false);
+            bottomShare.setEnabled(false);
+            bottomMerge.setClickable(false);
+            bottomMerge.setEnabled(false);
+        }else{
+            bottomDelete.setClickable(true);
+            bottomDelete.setEnabled(true);
+            bottomShare.setClickable(true);
+            bottomShare.setEnabled(true);
+            bottomMerge.setClickable(true);
+            bottomMerge.setEnabled(true);
+        }
+        if(mList.size()==mGridAdapter.getItemCount()){
+            allText.setText(R.string.unallpick);
+        }else{
+            allText.setText(R.string.allpick);
+        }
+    }
+
+    @OnClick({R.id.bottom_delete,R.id.bottom_share,R.id.bottom_merge})
+    public void onClick(View v){
+        switch (v.getId()){
+            case R.id.bottom_delete:
+                break;
+            case R.id.bottom_share:
+                break;
+            case R.id.bottom_merge:
+                break;
+        }
     }
 
     public void showMoreDialog(View moreView, final int position, final String blockid) {
@@ -171,9 +299,7 @@ public class MainActivity extends RobotPenActivity implements BlockLoaderData.Bl
         if (cursor != null) {
             mGridAdapter.swapCursor(cursor);
             showEmpty(cursor.getCount() == 0);
-            Log.e("=======onBlockUpdated======", "cursor:" + cursor.getCount());
         } else {
-            Log.e("=======onBlockUpdated======", "cursor=NULL");
             showEmpty(true);
         }
 
@@ -184,7 +310,6 @@ public class MainActivity extends RobotPenActivity implements BlockLoaderData.Bl
         @Override
         public void onReceive(Context context, Intent intent) {
             deleteBlock(intent.getStringExtra(MainActivity.EXTRA_BLOCKID));
-//            mWhiteBoardView.delCurrBlock();
         }
     }
 
@@ -192,9 +317,7 @@ public class MainActivity extends RobotPenActivity implements BlockLoaderData.Bl
     @Override
     protected void onResume() {
         super.onResume();
-//        mWhiteBoardView.initDrawArea();
         registerReceiver(mDelBroadcastReceiver, mIntentFilter);
-        Log.e("=======onResume============", "mTrail" + mTrailsManageModule.getBlockCount());
     }
 
     @Override
@@ -221,41 +344,7 @@ public class MainActivity extends RobotPenActivity implements BlockLoaderData.Bl
         }
     }
 
-    private void init() {
-        getSupportActionBar().setDisplayShowCustomEnabled(true); //Enable自定义的View
-        View customBar = LayoutInflater.from(this).inflate(R.layout.toolbar_layout, null);
-        customBar.findViewById(R.id.toolbar_settings).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                gotoSettingsActivity();
-            }
-        });
-        customBar.findViewById(R.id.toolbar_bluetooth).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                connectBlueTooth();
-            }
-        });
-        customBar.findViewById(R.id.toolbar_sync).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                syncOffLine();
-            }
-        });
-        getSupportActionBar().setCustomView(customBar);
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                gotoNewRecordBoardActivity();
-            }
-        });
 
-        mDelBroadcastReceiver = new DelBroadcastReceiver();
-        mIntentFilter = new IntentFilter();
-        mIntentFilter.addAction(ACTION_DELBOARD);
-
-    }
 
     @Override
     protected void onStart() {
@@ -281,14 +370,16 @@ public class MainActivity extends RobotPenActivity implements BlockLoaderData.Bl
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
+        if(mGridAdapter!=null&&mGridAdapter.getIsSelectorMode()){
+            setSelectorMode(false);
+        }else{
+            super.onBackPressed();
+        }
     }
 
     public void deleteBlock(String delblock) {
-//        mGridAdapter.notifyItemRemoved(position);
         DeleteBlocksAction.deleteBlock(delblock);
         mTrailsManageModule.delBlock(delblock);
-//        mGridAdapter.notifyItemChanged(position);
     }
 
 
@@ -302,21 +393,22 @@ public class MainActivity extends RobotPenActivity implements BlockLoaderData.Bl
     GridViewAdapter.OnItemClickListner itemClickListener = new GridViewAdapter.OnItemClickListner() {
         @Override
         public void onItemClickListner(View v, String blockid) {
-            gotoRecordBoardActivity(blockid);
+            if(mGridAdapter!=null&&mGridAdapter.getIsSelectorMode()){
+                refreshBottomLayout();
+            }else{
+                gotoRecordBoardActivity(blockid);
+            }
         }
     };
 
     public void gotoNewRecordBoardActivity() {
-//        String blockid = mWhiteBoardView.insertBlock(mWhiteBoardView.getBlockCount());
-
         String blockid =mTrailsManageModule.appendBlock(mTrailsManageModule.getEndBlock(),(long)mTrailsManageModule.getBlockCount());
         if (blockid == null) {
             Log.e("=======gotoNewRecordBoardActivity============", "blockid=null");
             return;
         }
-        Intent intent = new Intent(MainActivity.this, RecordBoardActivity.class);
+        Intent intent = new Intent(MainActivity.this, NewRecordBoardActivity.class);
         intent.putExtra(EXTRA_BLOCKID, blockid);
-        intent.putExtra(EXTRA_ISNEW, true);
         startActivityForResult(intent, 0);
     }
 
@@ -327,7 +419,6 @@ public class MainActivity extends RobotPenActivity implements BlockLoaderData.Bl
         }
         Intent intent = new Intent(MainActivity.this, RecordBoardActivity.class);
         intent.putExtra(EXTRA_BLOCKID, blockid);
-        intent.putExtra(EXTRA_ISNEW, false);
         startActivityForResult(intent, 0);
     }
 

@@ -38,6 +38,8 @@
             />
         <activity android:name="cn.txws.board.show.RecordBoardActivity"
             />
+        <activity android:name="cn.txws.board.show.NewRecordBoardActivity"
+            />
         <activity android:name="cn.txws.board.connect.BleConnectActivity"
             android:screenOrientation="portrait"
             />

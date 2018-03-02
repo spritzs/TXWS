@@ -25,6 +25,10 @@ import cn.txws.board.database.DatabaseWrapper;
 import cn.txws.board.database.action.ActionService;
 import cn.txws.board.database.action.BackgroundWorker;
 
+/**
+ * Created by zqs on 2018/2/26 .
+ * 数据模型实现
+ */
 public class DataModelImpl extends DataModel {
     private final String TAG="DataModelImpl";
     private final Context mContext;
@@ -83,8 +87,7 @@ public class DataModelImpl extends DataModel {
     public void onActivityResume() {
 
     }
-    
-  //add by JXH 2016.12.27 冷启动优化 end
+
     @Override
     public void onApplicationCreated() {
     	isAppOnCreate=true;

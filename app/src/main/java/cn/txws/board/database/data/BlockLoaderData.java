@@ -31,7 +31,8 @@ import cn.txws.board.database.binding.BindableData;
 import cn.txws.board.database.binding.BindingBase;
 
 /**
- * Services data needs for PeopleAndOptionsFragment.
+ * Created by zqs on 2018/2/26 .
+ * Services data needs for BlockLoaderData.
  */
 public class BlockLoaderData extends BindableData implements
         LoaderManager.LoaderCallbacks<Cursor> {
@@ -67,7 +68,7 @@ public class BlockLoaderData extends BindableData implements
                     break;
             }
         } else {
-            Log.w(TAG, "Loader created after unbinding PeopleAndOptionsFragment");
+            Log.w(TAG, "Loader created after unbinding MainActivity");
         }
         return null;
     }
@@ -89,7 +90,7 @@ public class BlockLoaderData extends BindableData implements
             }
         } else {
             Log.w(TAG,
-                    "Loader finished after unbinding PeopleAndOptionsFragment");
+                    "Loader finished after unbinding MainActivity");
         }
     }
 
@@ -111,7 +112,7 @@ public class BlockLoaderData extends BindableData implements
                     break;
             }
         } else {
-            Log.w(TAG, "Loader reset after unbinding PeopleAndOptionsFragment");
+            Log.w(TAG, "Loader reset after unbinding MainActivity");
         }
     }
 

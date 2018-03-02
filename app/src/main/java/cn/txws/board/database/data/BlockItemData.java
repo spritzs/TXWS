@@ -23,6 +23,7 @@ import cn.txws.board.database.DatabaseHelper;
 
 
 /**
+ * Created by zqs on 2018/2/26 .
  * Data model object used to power BlockItemData, which may be displayed either in
  * our list.
  */

@@ -16,7 +16,8 @@ import cn.txws.board.R;
 
 
 /**
- * Created by Administrator on 2018/1/26 0026.
+ * Created by zqs on 2018/1/26 .
+ * 颜色选择器
  */
 
 public class ColorGridViewAdapter extends ArrayAdapter<Integer> {

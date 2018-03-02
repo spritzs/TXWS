@@ -6,6 +6,7 @@ package cn.txws.board.util;
 import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
+import android.content.Context;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
@@ -14,6 +15,8 @@ import android.widget.PopupWindow;
 
 
 import java.util.List;
+
+import cn.txws.board.R;
 
 /**
  * An example animation handler
@@ -29,19 +32,23 @@ public class DefaultAnimationHandler {
     private boolean animating;
 
     List<View> mListView;
-
-    public DefaultAnimationHandler(List<View> listView) {
+    int[] transNum;
+    public DefaultAnimationHandler(List<View> listView,Context mContext) {
         setAnimating(false);
         mListView=listView;
+        int max=mContext.getResources().getDimensionPixelOffset(R.dimen.popmenu_width)-mContext.getResources().getDimensionPixelOffset(R.dimen.popmenu_icon);
+        int center=(max+mContext.getResources().getDimensionPixelOffset(R.dimen.popmenu_icon_padding))/2;
+        transNum=new int[]{0,center,max};
     }
-    int[] transNum={0,150,200};
+
 
     public void animateMenuOpening() {
+
         setAnimating(true);
         Animator lastAnimation = null;
         for (int i = 0; i < mListView.size(); i++) {
-            View v=mListView.get(i);
-
+            final View v=mListView.get(i);
+            v.setVisibility(View.INVISIBLE);
             PropertyValuesHolder pvhX = PropertyValuesHolder.ofFloat(View.TRANSLATION_X, transNum[i],0);
             PropertyValuesHolder pvhY = PropertyValuesHolder.ofFloat(View.TRANSLATION_Y, transNum[mListView.size()-i-1],0);
             PropertyValuesHolder pvhR = PropertyValuesHolder.ofFloat(View.ROTATION, 360);
@@ -52,7 +59,27 @@ public class DefaultAnimationHandler {
             final ObjectAnimator animation = ObjectAnimator.ofPropertyValuesHolder(v, pvhX, pvhY, pvhR, pvhsX, pvhsY, pvhA);
             animation.setDuration(DURATION);
             animation.setInterpolator(new OvershootInterpolator(0.9f));
-//            animation.addListener();
+            animation.addListener(new Animator.AnimatorListener() {
+                @Override
+                public void onAnimationStart(Animator animation) {
+                    v.setVisibility(View.VISIBLE);
+                }
+
+                @Override
+                public void onAnimationEnd(Animator animation) {
+
+                }
+
+                @Override
+                public void onAnimationCancel(Animator animation) {
+
+                }
+
+                @Override
+                public void onAnimationRepeat(Animator animation) {
+
+                }
+            });
 
             if(i == 0) {
                 lastAnimation = animation;

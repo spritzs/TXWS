@@ -10,12 +10,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,14 +28,54 @@ import cn.txws.board.database.data.BlockItemData;
 
 
 /**
- * Created by Administrator on 2018/1/26 0026.
+ * Created by zqs on 2018/1/26 0026.
+ * 主界面所有画板界面adpter
  */
 
 public class GridViewAdapter extends CursorRecyclerAdapter<GridViewAdapter.ViewHolder>{
     private LayoutInflater mInflater;
     private OnMoreClickListener mOnMoreClickListener;
     private OnItemClickListner onItemClickListner;//单击事件
-    private Bitmap mBitmap;
+    private OnLongClickListener onLongClickListner;//单击事件
+
+    private boolean isSelectorMode=false;
+    private List<String> selectorList=new ArrayList<String>();
+
+    public void setSelectorMode(boolean selectorMode){
+        isSelectorMode=selectorMode;
+        if(!selectorMode){
+            selectorList.clear();
+        }
+        notifyDataSetChanged();
+    }
+
+    public List<String> getSelectorList(){
+        return selectorList;
+    }
+
+
+    public void allPickOrUnPick(TextView text){
+        if(getItemCount()==selectorList.size()){
+            selectorList.clear();
+            text.setText(R.string.allpick);
+        }else{
+            for(int i=0;i<getItemCount();i++){
+                final BlockItemData data=new BlockItemData();
+                data.bind((Cursor) getItem(i));
+                String block=data.getBlockID();
+                if(!selectorList.contains(block)){
+                    selectorList.add(block);
+                }
+            }
+            text.setText(R.string.unallpick);
+        }
+        notifyDataSetChanged();
+    }
+
+
+    public boolean getIsSelectorMode(){
+        return isSelectorMode;
+    }
 
     public GridViewAdapter(Context context, Cursor cursor) {
         super(context,cursor,0);
@@ -55,21 +97,46 @@ public class GridViewAdapter extends CursorRecyclerAdapter<GridViewAdapter.ViewH
         holder.main.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if(isSelectorMode){
+                    if(holder.checkbox.isChecked()){
+                        holder.checkbox.setChecked(false);
+                        selectorList.remove(data.getBlockID());
+                    }else{
+                        holder.checkbox.setChecked(true);
+                        selectorList.add(data.getBlockID());
+                    }
+                }
                 if(onItemClickListner!=null){
                     onItemClickListner.onItemClickListner(v,data.getBlockID());
                 }
             }
         });
 
-        Glide.with(mContext).load(data.getImage()).diskCacheStrategy(DiskCacheStrategy.NONE).error(R.drawable.note_bg_noshade)
-                .placeholder(R.drawable.note_bg_noshade).skipMemoryCache(true).into(holder.img);
+        holder.main.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                if(onLongClickListner!=null){
+                    if(!isSelectorMode){
+                        selectorList.add(data.getBlockID());
+                    }
+                    onLongClickListner.onLongClick();
+                }
+                return true;
+            }
+        });
+
+        holder.checkbox.setVisibility(isSelectorMode?View.VISIBLE:View.INVISIBLE);
+        if(isSelectorMode){
+            holder.checkbox.setChecked(selectorList.contains(data.getBlockID()));
+        }
+        Glide.with(mContext).load(data.getImage()).diskCacheStrategy(DiskCacheStrategy.NONE).skipMemoryCache(true).into(holder.img);
+
     }
 
     @Override
     public ViewHolder createViewHolder(Context context, ViewGroup parent, int viewType) {
         View v=mInflater.inflate(R.layout.gridview_item,null);
         final ViewHolder holder=new ViewHolder(v);
-
         return holder;
     }
 
@@ -84,12 +151,14 @@ public class GridViewAdapter extends CursorRecyclerAdapter<GridViewAdapter.ViewH
         View main;
         TextView title;
         ImageView img;
+        CheckBox checkbox;
         ImageView more;
         public ViewHolder(View v){
             super(v);
             main=v;
             title=(TextView)v.findViewById(R.id.title);
             img=(ImageView)v.findViewById(R.id.img);
+            checkbox=(CheckBox)v.findViewById(R.id.checkbox);
             more=(ImageView)v.findViewById(R.id.ic_more);
         }
     }
@@ -98,11 +167,18 @@ public class GridViewAdapter extends CursorRecyclerAdapter<GridViewAdapter.ViewH
         this.onItemClickListner = onItemClickListner;
     }
 
+    public void setOnLongClickListener(OnLongClickListener onLongClickListner) {
+        this.onLongClickListner = onLongClickListner;
+    }
+
     public interface OnItemClickListner {
         void onItemClickListner(View v,String blockid);
     }
 
     public interface OnMoreClickListener{
         void onClick(View v,int position,String blockid);
+    }
+    public interface OnLongClickListener{
+        void onLongClick();
     }
 }

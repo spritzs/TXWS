@@ -19,8 +19,8 @@
         android:id="@+id/more_tool_parentlayout"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:visibility="invisible"
         android:gravity="center"
+        android:visibility="invisible"
         android:orientation="vertical">
 
         <LinearLayout
@@ -33,30 +33,13 @@
             android:paddingLeft="16dp"
             android:paddingRight="16dp">
 
-
             <ImageView
-                android:id="@+id/toolbar_pen"
+                android:id="@+id/tool_insert"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:scaleType="center"
-                android:src="@drawable/tool_pen1a_layer" />
-
-            <ImageView
-                android:id="@+id/toolbar_color_px"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:scaleType="center"
-                android:src="@drawable/tool_t_black_layer" />
-
-            <ImageView
-                android:id="@+id/toolbar_clean"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:scaleType="center"
-                android:src="@drawable/tool_earser_layer" />
+                android:src="@drawable/tool_insert_image_layer" />
 
             <ImageView
                 android:id="@+id/tool_bg"
@@ -66,6 +49,7 @@
                 android:scaleType="center"
                 android:src="@drawable/tool_change_bg_layer" />
 
+
             <ImageView
                 android:id="@+id/tool_handorpen"
                 android:layout_width="wrap_content"
@@ -73,14 +57,45 @@
                 android:layout_weight="1"
                 android:scaleType="center"
                 android:src="@drawable/tool_usehand_layer" />
-
             <ImageView
-                android:id="@+id/tool_recorder_record"
+                android:id="@+id/tool_play"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:scaleType="center"
-                android:src="@drawable/tool_record_layer" />
+                android:src="@drawable/tool_play_layer" />
+
+            <ImageView
+                android:id="@+id/toolbar_last"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:scaleType="center"
+                android:src="@drawable/tool_last_layer" />
+
+            <ImageView
+                android:id="@+id/toolbar_next"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:scaleType="center"
+                android:src="@drawable/tool_next_layer" />
+
+            <!--<ImageView-->
+                <!--android:id="@+id/tool_comfirm"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_weight="1"-->
+                <!--android:scaleType="center"-->
+                <!--android:src="@drawable/tool_video_stop_selector" />-->
+
+            <!--<ImageView-->
+                <!--android:id="@+id/tool_cancel"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_weight="1"-->
+                <!--android:scaleType="center"-->
+                <!--android:src="@drawable/tool_cancel_selector" />-->
 
         </LinearLayout>
     </LinearLayout>

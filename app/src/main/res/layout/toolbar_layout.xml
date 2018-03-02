@@ -9,6 +9,8 @@
         android:layout_centerVertical="true"
         android:background="?selectableItemBackgroundBorderless"
         android:layout_alignParentLeft="true"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
     <ImageView
@@ -27,6 +29,19 @@
         android:background="?selectableItemBackgroundBorderless"
         android:layout_alignParentRight="true"
         android:layout_marginRight="15dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    <TextView
+        android:id="@+id/toolbar_allpick"
+        android:text="@string/allpick"
+        android:layout_centerVertical="true"
+        android:textColor="@color/textColor"
+        android:visibility="invisible"
+        android:background="?selectableItemBackgroundBorderless"
+        android:layout_alignParentRight="true"
+        android:textSize="17sp"
+        android:layout_marginRight="5dp"
+        android:padding="10dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 </RelativeLayout>

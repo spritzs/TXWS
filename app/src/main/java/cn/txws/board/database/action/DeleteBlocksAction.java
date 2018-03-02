@@ -31,6 +31,7 @@ import cn.txws.board.util.AppUtil;
 
 
 /**
+ * Created by zqs on 2018/2/26 .
  * Action used to delete a single message.
  */
 public class DeleteBlocksAction extends Action implements Parcelable {

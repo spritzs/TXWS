@@ -62,7 +62,7 @@ public class BoardPopupMenu extends PopupWindow implements View.OnClickListener{
 
     @Override
     public void dismiss() {
-        DefaultAnimationHandler defaultAnimationHandler=new DefaultAnimationHandler(mListView);
+        DefaultAnimationHandler defaultAnimationHandler=new DefaultAnimationHandler(mListView,mContext);
         defaultAnimationHandler.animateMenuClosing(new Animator.AnimatorListener() {
             @Override
             public void onAnimationStart(Animator animation) {
@@ -96,7 +96,7 @@ public class BoardPopupMenu extends PopupWindow implements View.OnClickListener{
             int left = location[0] + parent.getWidth() - mContext.getResources().getDimensionPixelOffset(R.dimen.popmenu_width);
             int top = location[1] + parent.getHeight() - mContext.getResources().getDimensionPixelOffset(R.dimen.popmenu_height);
             this.showAtLocation(parent, 0, left, top);
-            DefaultAnimationHandler defaultAnimationHandler=new DefaultAnimationHandler(mListView);
+            DefaultAnimationHandler defaultAnimationHandler=new DefaultAnimationHandler(mListView,mContext);
             defaultAnimationHandler.animateMenuOpening();
         }
     }
@@ -129,7 +129,7 @@ public class BoardPopupMenu extends PopupWindow implements View.OnClickListener{
                 if(mListener!=null){
                     mListener.delete();
                 }
-                dismiss();
+                super.dismiss();
                 break;
             case R.id.id_pop_layout:
                 dismiss();

@@ -30,20 +30,28 @@
             android:src="@drawable/tool_share_layer" />
 
         <ImageView
-            android:id="@+id/tool_play"
+            android:id="@+id/toolbar_pen"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:scaleType="center"
-            android:src="@drawable/tool_play_layer" />
+            android:src="@drawable/tool_pen1a_layer" />
 
         <ImageView
-            android:id="@+id/tool_insert"
+            android:id="@+id/toolbar_color_px"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:scaleType="center"
-            android:src="@drawable/tool_insert_image_layer" />
+            android:src="@drawable/tool_t_black_layer" />
+
+        <ImageView
+            android:id="@+id/toolbar_clean"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:scaleType="center"
+            android:src="@drawable/tool_earser_layer" />
 
         <ImageView
             android:id="@+id/tool_clean"
@@ -54,20 +62,13 @@
             android:src="@drawable/tool_clean_layer" />
 
         <ImageView
-            android:id="@+id/toolbar_last"
+            android:id="@+id/tool_recorder_record"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:scaleType="center"
-            android:src="@drawable/tool_last_layer" />
+            android:src="@drawable/tool_record_layer" />
 
-        <ImageView
-            android:id="@+id/toolbar_next"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:scaleType="center"
-            android:src="@drawable/tool_next_layer" />
 
         <ImageView
             android:id="@+id/toolbar_more"

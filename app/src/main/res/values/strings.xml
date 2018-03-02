@@ -24,4 +24,12 @@
     <string name="grid_empty">请新建画板</string>
     <string name="share_title">画板分享</string>
     <string name="rename">重命名</string>
+    <string name="save_video">保存录像</string>
+    <string name="yes">是</string>
+    <string name="no">否</string>
+    <string name="allpick">全选</string>
+    <string name="unallpick">全不选</string>
+    <string name="bottom_delete">删除</string>
+    <string name="bottom_share">分享</string>
+    <string name="bottom_merge">合并</string>
 </resources>

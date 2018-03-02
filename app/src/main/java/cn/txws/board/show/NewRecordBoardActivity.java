@@ -67,9 +67,9 @@ import cn.txws.board.common.ResUtils;
 import cn.txws.board.database.action.InsertNewOrUpdateBlockAction;
 import cn.txws.board.util.AppUtil;
 
-public class RecordBoardActivity extends RobotPenActivity
+public class NewRecordBoardActivity extends RobotPenActivity
         implements WhiteBoardView.WhiteBoardInterface,
-        RecordBoardView.RecordBoardInterface,View.OnClickListener{
+        RecordBoardView.RecordBoardInterface, View.OnClickListener {
 
     DeviceType mDeDeviceType = DeviceType.P1;//默认连接设备为P1 当与连接设备有冲突时则需要进行切换
     float isRubber = 0;//是否是橡皮
@@ -98,18 +98,15 @@ public class RecordBoardActivity extends RobotPenActivity
 
     @BindView(R.id.more_tool_layout)
     View mToolLayout;
+    @BindView(R.id.tool_insert)
+    ImageView mToolInsertImage;
     @BindView(R.id.tool_bg)
     ImageView mToolBackground;
     @BindView(R.id.tool_handorpen)
     ImageView mToolHandOrPen;
-    @BindView(R.id.toolbar_pen)
-    ImageView mPen;
-    @BindView(R.id.toolbar_color_px)
-    ImageView mToolColorPicker;
-    @BindView(R.id.tool_recorder_record)
-    ImageView mToolRecordPlay;
 
-    ImageView mToolInsertImage;
+    ImageView mPen,mToolColorPicker,mToolRecordPlay;
+
 
     NoteManageModule mNoteManageModule;
     String mCurrentID;
@@ -120,7 +117,7 @@ public class RecordBoardActivity extends RobotPenActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_record_board);
+        setContentView(R.layout.activity_new_record_board);
         ButterKnife.bind(this);
         mHandler = new Handler();
         recordBoardView.setIsTouchWrite(true);
@@ -128,32 +125,34 @@ public class RecordBoardActivity extends RobotPenActivity
         mNoteManageModule = new NoteManageModule(this, MyApplication.getInstance().getDaoSession());
         mTrailsManageModule = new TrailsManageModule(this, MyApplication.getInstance().getDaoSession());
         mTrailsManageModule.setTitle(getNewNoteName()).setIsHorizontal(getIsHorizontal()).setDeviceType(getDeviceType()).setUserId(getCurrUserId()).setup(getNoteKey()).initBlock(null).asyncSave(true);
+
+
         recordBoardView.setLoadIgnorePhoto(false);
         recordBoardView.setDataSaveDir(ResUtils.getSavePath(ResUtils.DIR_NAME_DATA));
         recordBoardView.setIsTouchSmooth(true);
         recordBoardView.setShowRecordDialog(false);
-        mCurrentID=getIntent().getStringExtra(MainActivity.EXTRA_BLOCKID);
-
+        mCurrentID = getIntent().getStringExtra(MainActivity.EXTRA_BLOCKID);
         init();
     }
 
-
-
-    public void init(){
+    public void init() {
         initActionBar();
     }
-    public void initActionBar(){
+
+    public void initActionBar() {
         getSupportActionBar().setDisplayShowCustomEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
-        View customBar= LayoutInflater.from(this).inflate(R.layout.toolbar_edit_layout,null);
+        View customBar = LayoutInflater.from(this).inflate(R.layout.toolbar_new_layout, null);
         customBar.findViewById(R.id.toolbar_back).setOnClickListener(this);
         customBar.findViewById(R.id.toolbar_share).setOnClickListener(this);
-        customBar.findViewById(R.id.tool_play).setOnClickListener(this);
-        mToolInsertImage= (ImageView) customBar.findViewById(R.id.tool_insert);
-        mToolInsertImage.setOnClickListener(this);
+        mPen = (ImageView) customBar.findViewById(R.id.toolbar_pen);
+        mPen.setOnClickListener(this);
+        mToolColorPicker = (ImageView) customBar.findViewById(R.id.toolbar_color_px);
+        mToolColorPicker.setOnClickListener(this);
+        customBar.findViewById(R.id.toolbar_clean).setOnClickListener(this);
         customBar.findViewById(R.id.tool_clean).setOnClickListener(this);
-        customBar.findViewById(R.id.toolbar_last).setOnClickListener(this);
-        customBar.findViewById(R.id.toolbar_next).setOnClickListener(this);
+        mToolRecordPlay = (ImageView) customBar.findViewById(R.id.tool_recorder_record);
+        mToolRecordPlay.setOnClickListener(this);
         customBar.findViewById(R.id.toolbar_more).setOnClickListener(this);
         getSupportActionBar().setCustomView(customBar);
 
@@ -173,19 +172,17 @@ public class RecordBoardActivity extends RobotPenActivity
     }
 
 
-
-
     @Override
     protected void onResume() {
         super.onResume();
         recordBoardView.initDrawArea();
         checkIntentInsertPhoto();
-        if(Build.VERSION.SDK_INT >= 23 &&  ContextCompat.checkSelfPermission(this, "android.permission.RECORD_AUDIO") != 0) {
-            if(ActivityCompat.shouldShowRequestPermissionRationale((Activity)this, "android.permission.RECORD_AUDIO")) {
+        if (Build.VERSION.SDK_INT >= 23 && ContextCompat.checkSelfPermission(this, "android.permission.RECORD_AUDIO") != 0) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale((Activity) this, "android.permission.RECORD_AUDIO")) {
                 Toast.makeText(this, cn.robotpen.record.R.string.robotpen_permission_request, Toast.LENGTH_SHORT).show();
             }
 
-            ActivityCompat.requestPermissions((Activity)this, new String[]{"android.permission.RECORD_AUDIO"}, 0);
+            ActivityCompat.requestPermissions((Activity) this, new String[]{"android.permission.RECORD_AUDIO"}, 0);
         }
     }
 
@@ -209,11 +206,17 @@ public class RecordBoardActivity extends RobotPenActivity
     }
 
 
-    public void doInDatabase(){
-        if(isEdit){
-            String savePath=null;
-            if(ContextCompat.checkSelfPermission(this, "android.permission.WRITE_EXTERNAL_STORAGE") != 0) {
-                if(ActivityCompat.shouldShowRequestPermissionRationale((Activity)this, "android.permission.WRITE_EXTERNAL_STORAGE")) {
+    public void doInDatabase() {
+        if (!isEdit) {
+            Intent intent = new Intent(MainActivity.ACTION_DELBOARD);
+            intent.putExtra(MainActivity.EXTRA_BLOCKID, mCurrentID);
+            sendBroadcast(intent);
+            return;
+        }
+        if (isEdit) {
+            String savePath = null;
+            if (ContextCompat.checkSelfPermission(this, "android.permission.WRITE_EXTERNAL_STORAGE") != 0) {
+                if (ActivityCompat.shouldShowRequestPermissionRationale((Activity) this, "android.permission.WRITE_EXTERNAL_STORAGE")) {
                     Toast.makeText(this, cn.robotpen.record.R.string.robotpen_permission_request, 0).show();
                 }
 
@@ -221,13 +224,12 @@ public class RecordBoardActivity extends RobotPenActivity
             } else {
                 savePath = AppUtil.SAVEDIR + mCurrentID + ".jpg";
                 if (FileUtils.saveBitmap(loadBitmapFromView(recordBoardView), savePath)) {
-                    Log.e("======saveBitmap============","保存成功");
+                    Log.e("======saveBitmap============", "保存成功");
                 }
             }
-            InsertNewOrUpdateBlockAction.InsertNewOrUpdateBlock("随笔"+String.valueOf(mTrailsManageModule.getBlockCount()-1),mCurrentID,savePath,System.currentTimeMillis());
+            InsertNewOrUpdateBlockAction.InsertNewOrUpdateBlock("随笔" + String.valueOf(mTrailsManageModule.getBlockCount() - 1), mCurrentID, savePath, System.currentTimeMillis());
         }
     }
-
 
 
     @Override
@@ -235,7 +237,7 @@ public class RecordBoardActivity extends RobotPenActivity
         if (resultCode == RESULT_OK) {
             mInsertPhotoUri = null;
             mBgUri = null;
-            if (requestCode == SELECT_PICTURE && data != null){
+            if (requestCode == SELECT_PICTURE && data != null) {
                 mInsertPhotoUri = data.getData();
             }
             if (requestCode == SELECT_BG && data != null) {
@@ -246,6 +248,7 @@ public class RecordBoardActivity extends RobotPenActivity
 
     /**
      * 当服务服务连接成功后进行
+     *
      * @param name
      * @param service
      */
@@ -265,15 +268,15 @@ public class RecordBoardActivity extends RobotPenActivity
                     //判断当前设备与笔记设备是否一致
                     if (recordBoardView.getFrameSizeObject().getDeviceType() != type) {
                         mDeDeviceType = type;
-                        mNoteKey = NoteEntity.KEY_NOTEKEY_TMP ;
+                        mNoteKey = NoteEntity.KEY_NOTEKEY_TMP;
                     }
-                }else {
+                } else {
                     recordBoardView.setIsTouchWrite(true);
                 }
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
-        }else {
+        } else {
             recordBoardView.setIsTouchWrite(true);
         }
         //都需要刷新白板
@@ -282,30 +285,29 @@ public class RecordBoardActivity extends RobotPenActivity
     }
 
 
-
     /**
      * 检查是否有Intent传入需要插入的图片
      */
     public void checkIntentInsertPhoto() {
         //检查是否有需要插入的图片uri
-        mToolBackground.setImageResource(mBgUri!=null?R.drawable.tool_delete_bg_layer:R.drawable.tool_change_bg_layer);
-        mToolInsertImage.setImageResource(mInsertPhotoUri!=null?R.drawable.tool_comfirm_layer:R.drawable.tool_insert_image_layer);
+        mToolBackground.setImageResource(mBgUri != null ? R.drawable.tool_delete_bg_layer : R.drawable.tool_change_bg_layer);
+        mToolInsertImage.setImageResource(mInsertPhotoUri != null ? R.drawable.tool_comfirm_layer : R.drawable.tool_insert_image_layer);
         if (null != mInsertPhotoUri) {
-            recordBoardView.insertPhoto(getRealFilePath(RecordBoardActivity.this,mInsertPhotoUri));
+            recordBoardView.insertPhoto(getRealFilePath(NewRecordBoardActivity.this, mInsertPhotoUri));
             recordBoardView.startPhotoEdit(true); //插入图片后，设置图片可以编辑状态
             mInsertPhotoUri = null;
         }
         if (null != mBgUri) {
             recordBoardView.setBgPhoto(mBgUri);
-            hasBg=true;
+            hasBg = true;
             mBgUri = null;
-        }else{
+        } else {
             recordBoardView.setBackgroundResource(R.drawable.note_bg_noshade);
         }
-        mToolHandOrPen.setImageResource(recordBoardView.isTouchWrite()?R.drawable.tool_usehand_layer:R.drawable.tool_usepen_layer);
+        mToolHandOrPen.setImageResource(recordBoardView.isTouchWrite() ? R.drawable.tool_usehand_layer : R.drawable.tool_usepen_layer);
     }
 
-    @OnClick({R.id.toolbar_pen,R.id.toolbar_color_px,R.id.toolbar_clean,R.id.tool_bg,R.id.tool_handorpen,R.id.tool_recorder_record})
+    @OnClick({R.id.tool_insert,R.id.tool_bg,R.id.tool_handorpen,R.id.tool_play,R.id.toolbar_last,R.id.toolbar_next})
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.toolbar_back:
@@ -400,7 +402,7 @@ public class RecordBoardActivity extends RobotPenActivity
     }
 
     public void showRecordDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(RecordBoardActivity.this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(NewRecordBoardActivity.this);
         builder.setTitle(R.string.save_video);    //设置对话框标题
         builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
             @Override
@@ -427,25 +429,24 @@ public class RecordBoardActivity extends RobotPenActivity
     }
 
 
-
-    Integer[] colorSum=new Integer[]{R.drawable.tool_picker_black_selector,R.drawable.tool_picker_blue_selector,R.drawable.tool_picker_brown_selector,R.drawable.tool_picker_green_selector,R.drawable.tool_picker_green2_selector,R.drawable.tool_picker_yellow1_selector,R.drawable.tool_picker_violet_selector,R.drawable.tool_picker_red_selector,R.drawable.tool_picker_red1_selector,R.drawable.tool_picker_yellow2_selector,R.drawable.tool_picker_yellow_selector,R.drawable.tool_picker_white_selector};
-    Integer[] colorToolBar=new Integer[]{R.drawable.tool_t_black_layer,R.drawable.tool_t_blue_layer,R.drawable.tool_t_brown_layer,R.drawable.tool_t_green_layer,R.drawable.tool_t_green2_layer,R.drawable.tool_t_yellow1_layer,R.drawable.tool_t_violet_layer,R.drawable.tool_t_red_layer,R.drawable.tool_t_red1_layer,R.drawable.tool_t_yellow2_layer,R.drawable.tool_t_yellow_layer,R.drawable.tool_t_white_layer};
+    Integer[] colorSum = new Integer[]{R.drawable.tool_picker_black_selector, R.drawable.tool_picker_blue_selector, R.drawable.tool_picker_brown_selector, R.drawable.tool_picker_green_selector, R.drawable.tool_picker_green2_selector, R.drawable.tool_picker_yellow1_selector, R.drawable.tool_picker_violet_selector, R.drawable.tool_picker_red_selector, R.drawable.tool_picker_red1_selector, R.drawable.tool_picker_yellow2_selector, R.drawable.tool_picker_yellow_selector, R.drawable.tool_picker_white_selector};
+    Integer[] colorToolBar = new Integer[]{R.drawable.tool_t_black_layer, R.drawable.tool_t_blue_layer, R.drawable.tool_t_brown_layer, R.drawable.tool_t_green_layer, R.drawable.tool_t_green2_layer, R.drawable.tool_t_yellow1_layer, R.drawable.tool_t_violet_layer, R.drawable.tool_t_red_layer, R.drawable.tool_t_red1_layer, R.drawable.tool_t_yellow2_layer, R.drawable.tool_t_yellow_layer, R.drawable.tool_t_white_layer};
     ColorGridViewAdapter mColorGridAapter;
     AlertDialog mDialog;
 
-    public void showColorPixelDialog(){
-        View view=LayoutInflater.from(this).inflate(R.layout.colorpixel_dialog,null);
-        GridView gird= (GridView) view.findViewById(R.id.grid);
-        SeekBar seekBar= (SeekBar) view.findViewById(R.id.seek);
-        final TextView textView= (TextView) view.findViewById(R.id.text);
+    public void showColorPixelDialog() {
+        View view = LayoutInflater.from(this).inflate(R.layout.colorpixel_dialog, null);
+        GridView gird = (GridView) view.findViewById(R.id.grid);
+        SeekBar seekBar = (SeekBar) view.findViewById(R.id.seek);
+        final TextView textView = (TextView) view.findViewById(R.id.text);
         seekBar.setMax(20);
-        seekBar.setProgress((int)mPenWeight);
-        textView.setText(getString(R.string.tool_pen_pixels)+((int)mPenWeight)+"px");
+        seekBar.setProgress((int) mPenWeight);
+        textView.setText(getString(R.string.tool_pen_pixels) + ((int) mPenWeight) + "px");
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                mPenWeight=Math.max(2,progress);
-                textView.setText(getString(R.string.tool_pen_pixels)+((int)mPenWeight)+"px");
+                mPenWeight = Math.max(2, progress);
+                textView.setText(getString(R.string.tool_pen_pixels) + ((int) mPenWeight) + "px");
             }
 
             @Override
@@ -460,7 +461,7 @@ public class RecordBoardActivity extends RobotPenActivity
         });
 
 
-        mColorGridAapter=new ColorGridViewAdapter(this,colorSum);
+        mColorGridAapter = new ColorGridViewAdapter(this, colorSum);
 
         mColorGridAapter.setSelecterColor(mPenColor);
 
@@ -469,11 +470,11 @@ public class RecordBoardActivity extends RobotPenActivity
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 mColorGridAapter.setSelecterItem(position);
-                mPenColor=mColorGridAapter.getSelecterColor();
+                mPenColor = mColorGridAapter.getSelecterColor();
             }
         });
         gird.setAdapter(mColorGridAapter);
-        mDialog=new AlertDialog.Builder(RecordBoardActivity.this).setView(view).setCancelable(true).setTitle(R.string.colorpixel_dialog_title).setPositiveButton("确定", new DialogInterface.OnClickListener() {
+        mDialog = new AlertDialog.Builder(NewRecordBoardActivity.this).setView(view).setCancelable(true).setTitle(R.string.colorpixel_dialog_title).setPositiveButton("确定", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 mDialog.dismiss();
@@ -487,21 +488,22 @@ public class RecordBoardActivity extends RobotPenActivity
         });
     }
 
-    int saveRubber=50;
-    public void showCleanDialog(){
-        View view=LayoutInflater.from(this).inflate(R.layout.clean_dialog,null);
-        SeekBar seekBar= (SeekBar) view.findViewById(R.id.seek);
-        final TextView textView= (TextView) view.findViewById(R.id.text);
-        isRubber=saveRubber;
+    int saveRubber = 50;
+
+    public void showCleanDialog() {
+        View view = LayoutInflater.from(this).inflate(R.layout.clean_dialog, null);
+        SeekBar seekBar = (SeekBar) view.findViewById(R.id.seek);
+        final TextView textView = (TextView) view.findViewById(R.id.text);
+        isRubber = saveRubber;
         seekBar.setMax(10);
-        seekBar.setProgress(saveRubber/50);
-        textView.setText(getString(R.string.tool_earser_pixels)+(saveRubber)+"px");
+        seekBar.setProgress(saveRubber / 50);
+        textView.setText(getString(R.string.tool_earser_pixels) + (saveRubber) + "px");
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                saveRubber=progress*50;
-                isRubber=saveRubber;
-                textView.setText(getString(R.string.tool_pen_pixels)+(saveRubber)+"px");
+                saveRubber = progress * 50;
+                isRubber = saveRubber;
+                textView.setText(getString(R.string.tool_pen_pixels) + (saveRubber) + "px");
             }
 
             @Override
@@ -515,7 +517,7 @@ public class RecordBoardActivity extends RobotPenActivity
             }
         });
 
-        mDialog=new AlertDialog.Builder(RecordBoardActivity.this).setView(view).setCancelable(true).setTitle(R.string.earser_dialog_title).setPositiveButton("确定", new DialogInterface.OnClickListener() {
+        mDialog = new AlertDialog.Builder(NewRecordBoardActivity.this).setView(view).setCancelable(true).setTitle(R.string.earser_dialog_title).setPositiveButton("确定", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 mDialog.dismiss();
@@ -524,23 +526,20 @@ public class RecordBoardActivity extends RobotPenActivity
 
     }
 
-
-
-
-    public void animToolLayout(boolean open){
+    public void animToolLayout(boolean open) {
         mToolParentLayout.setVisibility(View.VISIBLE);
         TranslateAnimation trans;
-        if(open){
-            trans=new TranslateAnimation(Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, 0.0f,
-                    Animation.RELATIVE_TO_PARENT, -1.0f, Animation.RELATIVE_TO_PARENT, 0.0f  );
-        }else{
-            trans=new TranslateAnimation(Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT,0.0f,
-                    Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT,  -1.0f  );
+        if (open) {
+            trans = new TranslateAnimation(Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, 0.0f,
+                    Animation.RELATIVE_TO_PARENT, -1.0f, Animation.RELATIVE_TO_PARENT, 0.0f);
+        } else {
+            trans = new TranslateAnimation(Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, 0.0f,
+                    Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, -1.0f);
         }
         trans.setDuration(400);
         trans.setFillAfter(true);
         trans.setInterpolator(new DecelerateInterpolator());
-        toolOpening=open;
+        toolOpening = open;
         trans.setAnimationListener(new Animation.AnimationListener() {
             @Override
             public void onAnimationStart(Animation animation) {
@@ -549,7 +548,7 @@ public class RecordBoardActivity extends RobotPenActivity
 
             @Override
             public void onAnimationEnd(Animation animation) {
-                if(!toolOpening){
+                if (!toolOpening) {
                     mToolParentLayout.setVisibility(View.INVISIBLE);
                 }
             }
@@ -566,11 +565,11 @@ public class RecordBoardActivity extends RobotPenActivity
     public boolean isScreenLanscape() {
 
         Configuration mConfiguration = this.getResources().getConfiguration(); //获取设置的配置信息
-        int ori = mConfiguration.orientation ; //获取屏幕方向
+        int ori = mConfiguration.orientation; //获取屏幕方向
 
-        if(ori == mConfiguration.ORIENTATION_LANDSCAPE){
+        if (ori == mConfiguration.ORIENTATION_LANDSCAPE) {
             return true;//横屏
-        }else if(ori == mConfiguration.ORIENTATION_PORTRAIT){
+        } else if (ori == mConfiguration.ORIENTATION_PORTRAIT) {
             return false;//竖屏
         }
         return false;
@@ -583,21 +582,21 @@ public class RecordBoardActivity extends RobotPenActivity
      * @param uri
      * @return the file path or null
      */
-    public static String getRealFilePath(final Context context, final Uri uri ) {
-        if ( null == uri ) return null;
+    public static String getRealFilePath(final Context context, final Uri uri) {
+        if (null == uri) return null;
         final String scheme = uri.getScheme();
         String data = null;
-        if ( scheme == null )
+        if (scheme == null)
             data = uri.getPath();
-        else if ( ContentResolver.SCHEME_FILE.equals( scheme ) ) {
+        else if (ContentResolver.SCHEME_FILE.equals(scheme)) {
             data = uri.getPath();
-        } else if ( ContentResolver.SCHEME_CONTENT.equals( scheme ) ) {
-            Cursor cursor = context.getContentResolver().query( uri, new String[] { MediaStore.Images.ImageColumns.DATA }, null, null, null );
-            if ( null != cursor ) {
-                if ( cursor.moveToFirst() ) {
-                    int index = cursor.getColumnIndex( MediaStore.Images.ImageColumns.DATA );
-                    if ( index > -1 ) {
-                        data = cursor.getString( index );
+        } else if (ContentResolver.SCHEME_CONTENT.equals(scheme)) {
+            Cursor cursor = context.getContentResolver().query(uri, new String[]{MediaStore.Images.ImageColumns.DATA}, null, null, null);
+            if (null != cursor) {
+                if (cursor.moveToFirst()) {
+                    int index = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
+                    if (index > -1) {
+                        data = cursor.getString(index);
                     }
                 }
                 cursor.close();
@@ -653,7 +652,7 @@ public class RecordBoardActivity extends RobotPenActivity
 
     @Override
     public boolean onEvent(WhiteBoardView.BoardEvent boardEvent, Object o) {
-        Log.e("===choose======", "boardEvent"+boardEvent);
+        Log.e("===choose======", "boardEvent" + boardEvent);
         switch (boardEvent) {
             case TRAILS_COMPLETE:
 //                try {
@@ -677,9 +676,9 @@ public class RecordBoardActivity extends RobotPenActivity
             case ERROR_SCENE_TYPE: //横竖屏更换
                 break;
             case ON_TRAILS:
-                CLog.i(""+((TrailsEntity)o).getTrails());
-                isEdit=true;
-                isTrailEdit=true;
+                CLog.i("" + ((TrailsEntity) o).getTrails());
+                isEdit = true;
+                isTrailEdit = true;
                 break;
         }
         return true;
@@ -719,7 +718,7 @@ public class RecordBoardActivity extends RobotPenActivity
     }
 
     /**
-    *接收录制中的各种状态进行处理
+     * 接收录制中的各种状态进行处理
      */
     @Override
     public boolean onRecordState(RecordState recordState, String s) {
@@ -750,13 +749,13 @@ public class RecordBoardActivity extends RobotPenActivity
 
     @Override
     public boolean onRecordTimeChange(Date date) {
-    // 显示时间
+        // 显示时间
         return true;
     }
 
     @Override
     public void getRecordVideoName(String s) {
-        Log.e("test","getRecordVideoName :"+s);
+        Log.e("test", "getRecordVideoName :" + s);
     }
 
 
@@ -783,24 +782,25 @@ public class RecordBoardActivity extends RobotPenActivity
     @Override
     public void onPenPositionChanged(int deviceType, int x, int y, int presure, byte state) {
         super.onPenPositionChanged(deviceType, x, y, presure, state);
-        Log.e("=======onPenPositionChanged=======","x:"+x);
-        if(isRubber==0) {// isRubber==0  现在没用橡皮察，止选择橡皮擦的时候，不小心触碰笔，绘制笔迹。
+        Log.e("=======onPenPositionChanged=======", "x:" + x);
+        if (isRubber == 0) {// isRubber==0  现在没用橡皮察，止选择橡皮擦的时候，不小心触碰笔，绘制笔迹。
 //            DevicePoint p = DevicePoint.obtain(deviceType, x, y, presure, state);
 //            recordBoardView.drawLine(p);
             DeviceType type = DeviceType.toDeviceType(deviceType);
-            recordBoardView.drawDevicePoint(type,x,y,presure,state);
+            recordBoardView.drawDevicePoint(type, x, y, presure, state);
         }
     }
 
     private int currentPage = 0;
+
     @Override
     public void onPageInfo(int currentPage, int totalPage) {
-        this.currentPage=currentPage;
+        this.currentPage = currentPage;
     }
 
     @Override
     public void onPageNumberAndCategory(int pageNumber, int category) {
-        CLog.d("插入页码："+pageNumber+" 插入的页码类别："+category);
+        CLog.d("插入页码：" + pageNumber + " 插入的页码类别：" + category);
     }
 
     @Override
@@ -844,7 +844,7 @@ public class RecordBoardActivity extends RobotPenActivity
                 onEventNextPage();
                 break;
             case 0x05:
-                recordBoardView .insertBlock(currentPage);
+                recordBoardView.insertBlock(currentPage);
                 break;
         }
 
@@ -855,22 +855,22 @@ public class RecordBoardActivity extends RobotPenActivity
      * 用于响应设备按钮事件的翻页
      */
     private void onEventFrontPage() {
-            if (recordBoardView.isFirstBlock()) {
-                recordBoardView.lastBlock();
-            } else {
-                recordBoardView.frontBlock();
-            }
+        if (recordBoardView.isFirstBlock()) {
+            recordBoardView.lastBlock();
+        } else {
+            recordBoardView.frontBlock();
+        }
     }
 
     /**
      * 用于响应设备按钮事件的翻页
      */
     private void onEventNextPage() {
-            if (recordBoardView.isLastBlock()){
-                recordBoardView.firstBlock();
-            } else {
-                recordBoardView.nextBlock();
-            }
+        if (recordBoardView.isLastBlock()) {
+            recordBoardView.firstBlock();
+        } else {
+            recordBoardView.nextBlock();
+        }
     }
 
     private Bitmap loadBitmapFromView(View v) {
