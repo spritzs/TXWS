@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.media.ThumbnailUtils;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -40,11 +41,13 @@ public class GridViewAdapter extends CursorRecyclerAdapter<GridViewAdapter.ViewH
 
     private boolean isSelectorMode=false;
     private List<String> selectorList=new ArrayList<String>();
+    private List<String> selectorPictureList=new ArrayList<String>();
 
     public void setSelectorMode(boolean selectorMode){
         isSelectorMode=selectorMode;
         if(!selectorMode){
             selectorList.clear();
+            selectorPictureList.clear();
         }
         notifyDataSetChanged();
     }
@@ -53,18 +56,25 @@ public class GridViewAdapter extends CursorRecyclerAdapter<GridViewAdapter.ViewH
         return selectorList;
     }
 
+    public List<String> getSelectorPictureList(){
+        return selectorPictureList;
+    }
+
 
     public void allPickOrUnPick(TextView text){
         if(getItemCount()==selectorList.size()){
             selectorList.clear();
+            selectorPictureList.clear();
             text.setText(R.string.allpick);
         }else{
             for(int i=0;i<getItemCount();i++){
                 final BlockItemData data=new BlockItemData();
                 data.bind((Cursor) getItem(i));
                 String block=data.getBlockID();
+                String path=data.getImage();
                 if(!selectorList.contains(block)){
                     selectorList.add(block);
+                    selectorPictureList.add(path);
                 }
             }
             text.setText(R.string.unallpick);
@@ -101,9 +111,11 @@ public class GridViewAdapter extends CursorRecyclerAdapter<GridViewAdapter.ViewH
                     if(holder.checkbox.isChecked()){
                         holder.checkbox.setChecked(false);
                         selectorList.remove(data.getBlockID());
+                        selectorPictureList.remove(data.getImage());
                     }else{
                         holder.checkbox.setChecked(true);
                         selectorList.add(data.getBlockID());
+                        selectorPictureList.add(data.getImage());
                     }
                 }
                 if(onItemClickListner!=null){
@@ -118,6 +130,7 @@ public class GridViewAdapter extends CursorRecyclerAdapter<GridViewAdapter.ViewH
                 if(onLongClickListner!=null){
                     if(!isSelectorMode){
                         selectorList.add(data.getBlockID());
+                        selectorPictureList.add(data.getImage());
                     }
                     onLongClickListner.onLongClick();
                 }
@@ -129,7 +142,7 @@ public class GridViewAdapter extends CursorRecyclerAdapter<GridViewAdapter.ViewH
         if(isSelectorMode){
             holder.checkbox.setChecked(selectorList.contains(data.getBlockID()));
         }
-        Glide.with(mContext).load(data.getImage()).diskCacheStrategy(DiskCacheStrategy.NONE).skipMemoryCache(true).into(holder.img);
+        Glide.with(mContext).load(data.getImage()).diskCacheStrategy(DiskCacheStrategy.NONE).placeholder(R.drawable.note_bg_noshade).skipMemoryCache(true).into(holder.img);
 
     }
 

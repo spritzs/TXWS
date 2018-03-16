@@ -21,37 +21,47 @@
             android:paddingBottom="10dp"
             android:src="@drawable/toolbar_back_black" />
 
-        <ImageView
-            android:id="@+id/toolbar_share"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:scaleType="center"
-            android:src="@drawable/tool_share_layer" />
 
         <ImageView
-            android:id="@+id/tool_play"
+            android:id="@+id/toolbar_handorpen"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:scaleType="center"
-            android:src="@drawable/tool_play_layer" />
+            android:src="@drawable/tool_usehand_layer" />
 
         <ImageView
-            android:id="@+id/tool_insert"
+            android:id="@+id/toolbar_pen"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:scaleType="center"
-            android:src="@drawable/tool_insert_image_layer" />
+            android:src="@drawable/tool_pen1a_layer" />
 
         <ImageView
-            android:id="@+id/tool_clean"
+            android:id="@+id/toolbar_color_px"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:scaleType="center"
-            android:src="@drawable/tool_clean_layer" />
+            android:src="@drawable/tool_t_black_layer" />
+
+        <ImageView
+            android:id="@+id/toolbar_clean"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:scaleType="center"
+            android:src="@drawable/tool_earser_layer" />
+
+        <!--<ImageView-->
+            <!--android:id="@+id/tool_clean"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:layout_weight="1"-->
+            <!--android:scaleType="center"-->
+            <!--android:visibility="gone"-->
+            <!--android:src="@drawable/tool_clean_layer" />-->
 
         <ImageView
             android:id="@+id/toolbar_last"

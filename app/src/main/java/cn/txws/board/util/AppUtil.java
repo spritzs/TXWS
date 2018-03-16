@@ -24,6 +24,9 @@ import android.os.Handler;
 import android.os.Looper;
 
 import java.io.File;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.List;
 
 import cn.txws.board.R;
 
@@ -37,4 +40,24 @@ public class AppUtil {
         intent.setType("image/*");
         context.startActivity(Intent.createChooser(intent,context.getString(R.string.share_title)));
     }
+
+    public static void sharePictrues(Context context, ArrayList<Uri> paths) {
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.setAction("android.intent.action.SEND_MULTIPLE");
+        intent.setType("image/*");
+//        intent.putExtra("Kdescription", kdescription);
+        intent.putExtra(Intent.EXTRA_STREAM, paths);
+        context.startActivity(intent);
+
+    }
+
+    public static void sharePictruesString(Context context,List<String> paths) {
+        ArrayList<Uri> uris=new ArrayList<Uri>();
+        for(String path:paths){
+            Uri uri=Uri.fromFile(new File(path));
+            uris.add(uri);
+        }
+        sharePictrues(context,uris);
+    }
+
 }

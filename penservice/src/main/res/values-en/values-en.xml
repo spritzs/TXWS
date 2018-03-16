@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="close">Close</string>
+    <string name="disconnect_device">Disconnect RobotPen</string>
+    <string name="notify_device_info">Connected %1$s </string>
+    <string name="ota">OTA updating</string>
+    <string name="pen_service_busy">RobotPen service busy.</string>
+    <string name="robot_pen_service">RobotPen service</string>
+    <string name="robot_pen_service_ready_content">RobotPen serivce disconnected</string>
+    <string name="robot_pen_service_started">RobotPen service running</string>
+    <string name="state_sync">Synchronizing</string>
+    <string name="usb_permission_diny">USB Permission deny</string>
+</resources>

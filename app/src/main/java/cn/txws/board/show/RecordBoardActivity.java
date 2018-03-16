@@ -39,6 +39,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -84,7 +85,7 @@ public class RecordBoardActivity extends RobotPenActivity
     Uri mInsertPhotoUri = null;
     Uri mBgUri = null;
     int butFlag = 0;
-    List<TrailsEntity> mTrailsEntitys;
+    List<TrailsEntity> mTrailsEntitys,mOriginEntitys;
     TrailsManageModule mTrailsManageModule;
 
     @BindView(R.id.recordBoardView)
@@ -98,22 +99,47 @@ public class RecordBoardActivity extends RobotPenActivity
 
     @BindView(R.id.more_tool_layout)
     View mToolLayout;
+    @BindView(R.id.tool_insert)
+    ImageView mToolInsertImage;
     @BindView(R.id.tool_bg)
     ImageView mToolBackground;
-    @BindView(R.id.tool_handorpen)
-    ImageView mToolHandOrPen;
-    @BindView(R.id.toolbar_pen)
-    ImageView mPen;
-    @BindView(R.id.toolbar_color_px)
-    ImageView mToolColorPicker;
     @BindView(R.id.tool_recorder_record)
     ImageView mToolRecordPlay;
+    @BindView(R.id.seekbar)
+    SeekBar mSeekbar;
 
-    ImageView mToolInsertImage;
+    ImageView mToolHandOrPen,mPen,mToolColorPicker;
+    boolean isFirst=true;
+    int isTailsEdit=0;
+
+    public void initActionBar(){
+        getSupportActionBar().setDisplayShowCustomEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        View customBar= LayoutInflater.from(this).inflate(R.layout.toolbar_edit_layout,null);
+        customBar.findViewById(R.id.toolbar_back).setOnClickListener(this);
+        customBar.findViewById(R.id.toolbar_handorpen).setOnClickListener(this);
+        customBar.findViewById(R.id.toolbar_pen).setOnClickListener(this);
+
+        customBar.findViewById(R.id.toolbar_color_px).setOnClickListener(this);
+        customBar.findViewById(R.id.toolbar_clean).setOnClickListener(this);
+        customBar.findViewById(R.id.toolbar_last).setOnClickListener(this);
+        customBar.findViewById(R.id.toolbar_next).setOnClickListener(this);
+        customBar.findViewById(R.id.toolbar_more).setOnClickListener(this);
+
+        mToolHandOrPen= (ImageView) customBar.findViewById(R.id.toolbar_handorpen);
+        mPen= (ImageView) customBar.findViewById(R.id.toolbar_pen);
+        mToolColorPicker= (ImageView) customBar.findViewById(R.id.toolbar_color_px);
+
+
+        getSupportActionBar().setCustomView(customBar);
+
+    }
+
+
 
     NoteManageModule mNoteManageModule;
     String mCurrentID;
-    boolean isEdit=false,hasBg=false,isTrailEdit=true;
+    boolean isNew=false,isEdit=false,hasBg=false;
     boolean toolOpening=false;
 
 
@@ -132,6 +158,7 @@ public class RecordBoardActivity extends RobotPenActivity
         recordBoardView.setDataSaveDir(ResUtils.getSavePath(ResUtils.DIR_NAME_DATA));
         recordBoardView.setIsTouchSmooth(true);
         recordBoardView.setShowRecordDialog(false);
+		isNew=getIntent().getBooleanExtra(MainActivity.EXTRA_ISNEW,false);
         mCurrentID=getIntent().getStringExtra(MainActivity.EXTRA_BLOCKID);
 
         init();
@@ -142,22 +169,7 @@ public class RecordBoardActivity extends RobotPenActivity
     public void init(){
         initActionBar();
     }
-    public void initActionBar(){
-        getSupportActionBar().setDisplayShowCustomEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
-        View customBar= LayoutInflater.from(this).inflate(R.layout.toolbar_edit_layout,null);
-        customBar.findViewById(R.id.toolbar_back).setOnClickListener(this);
-        customBar.findViewById(R.id.toolbar_share).setOnClickListener(this);
-        customBar.findViewById(R.id.tool_play).setOnClickListener(this);
-        mToolInsertImage= (ImageView) customBar.findViewById(R.id.tool_insert);
-        mToolInsertImage.setOnClickListener(this);
-        customBar.findViewById(R.id.tool_clean).setOnClickListener(this);
-        customBar.findViewById(R.id.toolbar_last).setOnClickListener(this);
-        customBar.findViewById(R.id.toolbar_next).setOnClickListener(this);
-        customBar.findViewById(R.id.toolbar_more).setOnClickListener(this);
-        getSupportActionBar().setCustomView(customBar);
 
-    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -210,6 +222,14 @@ public class RecordBoardActivity extends RobotPenActivity
 
 
     public void doInDatabase(){
+		if(isNew){
+            if (!isEdit) {
+                Intent intent = new Intent(MainActivity.ACTION_DELBOARD);
+                intent.putExtra(MainActivity.EXTRA_BLOCKID, mCurrentID);
+                sendBroadcast(intent);
+                return;
+            }
+        }	
         if(isEdit){
             String savePath=null;
             if(ContextCompat.checkSelfPermission(this, "android.permission.WRITE_EXTERNAL_STORAGE") != 0) {
@@ -221,7 +241,7 @@ public class RecordBoardActivity extends RobotPenActivity
             } else {
                 savePath = AppUtil.SAVEDIR + mCurrentID + ".jpg";
                 if (FileUtils.saveBitmap(loadBitmapFromView(recordBoardView), savePath)) {
-                    Log.e("======saveBitmap============","保存成功");
+                    Log.e("======saveBitmap============","保存成功"+mCurrentID);
                 }
             }
             InsertNewOrUpdateBlockAction.InsertNewOrUpdateBlock("随笔"+String.valueOf(mTrailsManageModule.getBlockCount()-1),mCurrentID,savePath,System.currentTimeMillis());
@@ -305,21 +325,21 @@ public class RecordBoardActivity extends RobotPenActivity
         mToolHandOrPen.setImageResource(recordBoardView.isTouchWrite()?R.drawable.tool_usehand_layer:R.drawable.tool_usepen_layer);
     }
 
-    @OnClick({R.id.toolbar_pen,R.id.toolbar_color_px,R.id.toolbar_clean,R.id.tool_bg,R.id.tool_handorpen,R.id.tool_recorder_record})
+    @OnClick({R.id.tool_insert,R.id.tool_bg,R.id.tool_play,R.id.tool_recorder_record,R.id.tool_share})
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.toolbar_back:
                 finish();
                 break;
-            case R.id.toolbar_share:
+            case R.id.tool_share:
                 String savePath = AppUtil.SAVEDIR + mCurrentID + ".jpg";
                 if (FileUtils.saveBitmap(loadBitmapFromView(recordBoardView), savePath)) {
                     AppUtil.sharePictrue(this,savePath);
                 }
                 break;
             case R.id.toolbar_pen:
-                List<TrailsEntity> list=mTrailsManageModule.getTrails(mCurrentID);
-                recordBoardView.loadTrails(list,true);
+//                List<TrailsEntity> list=mTrailsManageModule.getTrails(mCurrentID);
+
                 break;
             case R.id.toolbar_color_px:
                 showColorPixelDialog();
@@ -329,29 +349,36 @@ public class RecordBoardActivity extends RobotPenActivity
                 showCleanDialog();
                 break;
             case R.id.toolbar_last:
-                isEdit=true;
-                if(isTrailEdit){
-                    mTrailsEntitys=mTrailsManageModule.getTrails(mCurrentID);
-                    isTrailEdit=false;
+                Log.e("=======last==========",""+mOriginEntitys.size());
+                try {
+                    isEdit = true;
+                    isTailsEdit=0;
+                    recordBoardView.backTrail();
+                }catch (Exception e){
+                    e.printStackTrace();
                 }
-                recordBoardView.backTrail();
                 break;
             case R.id.toolbar_next:
-                isEdit=true;
-                int num=mTrailsManageModule.getTrails(mCurrentID).size();
-                if(mTrailsEntitys!=null&&num<mTrailsEntitys.size()){
-                    recordBoardView.saveTrailsEntity(mTrailsEntitys.get(num));
-                    recordBoardView.loadTrails();
+                try {
+                    isEdit=true;
+                    isTailsEdit=0;
+                    int num=mTrailsManageModule.getTrails(mCurrentID).size();
+                    if(mOriginEntitys!=null&&num<mOriginEntitys.size()){
+                        recordBoardView.saveTrailsEntity(mOriginEntitys.get(num));
+                        recordBoardView.loadTrails();
+                    }
+                }catch (Exception e){
+                    e.printStackTrace();
                 }
                 break;
             case R.id.toolbar_more:
                 animToolLayout(!toolOpening);
                 break;
 
-            case R.id.tool_clean:
-                recordBoardView.cleanScreen();
-                recordBoardView.startPhotoEdit(false);// 退出图片编辑模式，否则此时点击图平铺会崩溃
-                break;
+//            case R.id.tool_clean:
+//                recordBoardView.cleanScreen();
+//                recordBoardView.startPhotoEdit(false);// 退出图片编辑模式，否则此时点击图平铺会崩溃
+//                break;
             case R.id.tool_insert:
                 if(recordBoardView.getIsPhotoEdit()){
                     recordBoardView.startPhotoEdit(false);
@@ -375,7 +402,7 @@ public class RecordBoardActivity extends RobotPenActivity
                     isEdit=true;
                 }
                 break;
-            case R.id.tool_handorpen:
+            case R.id.toolbar_handorpen:
                 recordBoardView.setIsTouchWrite(!recordBoardView.isTouchWrite());
                 mToolHandOrPen.setImageResource(recordBoardView.isTouchWrite()?R.drawable.tool_usehand_layer:R.drawable.tool_usepen_layer);
                 break;
@@ -393,7 +420,10 @@ public class RecordBoardActivity extends RobotPenActivity
                 }
                 break;
             case R.id.tool_play:
-
+                List<TrailsEntity> mTials=mTrailsManageModule.getTrails(mCurrentID);
+                if(mTials!=null){
+                    recordBoardView.loadTrails(mTials,false,true);
+                }
                 break;
 
         }
@@ -530,6 +560,7 @@ public class RecordBoardActivity extends RobotPenActivity
     public void animToolLayout(boolean open){
         mToolParentLayout.setVisibility(View.VISIBLE);
         TranslateAnimation trans;
+        mSeekbar.setVisibility(open?View.VISIBLE:View.GONE);
         if(open){
             trans=new TranslateAnimation(Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, 0.0f,
                     Animation.RELATIVE_TO_PARENT, -1.0f, Animation.RELATIVE_TO_PARENT, 0.0f  );
@@ -664,22 +695,31 @@ public class RecordBoardActivity extends RobotPenActivity
                 break;
 
             case TRAILS_LOADING:
-                recordBoardView.toBlock(mCurrentID);
-
+                if(isFirst){
+                    recordBoardView.toBlock(mCurrentID);
+                    mOriginEntitys=mTrailsManageModule.getTrails(mCurrentID);
+                    isFirst=false;
+                }
                 break;
             case BOARD_AREA_COMPLETE: //白板区域加载完成
                 recordBoardView.beginBlock();
-
                 break;
-            case ERROR_DEVICE_TYPE: //检测到连接设备更换
-
+            case PEN_DOWN:
+                isTailsEdit=1;
                 break;
-            case ERROR_SCENE_TYPE: //横竖屏更换
+            case PEN_UP:
+                isTailsEdit+=2;
                 break;
             case ON_TRAILS:
                 CLog.i(""+((TrailsEntity)o).getTrails());
+                mTrailsEntitys=mTrailsManageModule.getTrails(mCurrentID);
+                Log.e("=======ON_TRAILS======",""+isTailsEdit);
+                if(isTailsEdit==3){
+                    mOriginEntitys=mTrailsEntitys;
+                }
+                isTailsEdit=0;
                 isEdit=true;
-                isTrailEdit=true;
+//                mTrailsEntitys = mTrailsManageModule.getTrails(mCurrentID);
                 break;
         }
         return true;
@@ -783,7 +823,6 @@ public class RecordBoardActivity extends RobotPenActivity
     @Override
     public void onPenPositionChanged(int deviceType, int x, int y, int presure, byte state) {
         super.onPenPositionChanged(deviceType, x, y, presure, state);
-        Log.e("=======onPenPositionChanged=======","x:"+x);
         if(isRubber==0) {// isRubber==0  现在没用橡皮察，止选择橡皮擦的时候，不小心触碰笔，绘制笔迹。
 //            DevicePoint p = DevicePoint.obtain(deviceType, x, y, presure, state);
 //            recordBoardView.drawLine(p);

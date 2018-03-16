@@ -32,4 +32,8 @@
     <string name="bottom_delete">删除</string>
     <string name="bottom_share">分享</string>
     <string name="bottom_merge">合并</string>
+    <string name="delete_message">确定删除这些画板?</string>
+    <string name="delete_title">删除</string>
+    <string name="confirm">确认</string>
+    <string name="cancel">取消</string>
 </resources>

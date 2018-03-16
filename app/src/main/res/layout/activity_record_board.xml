@@ -32,31 +32,13 @@
             android:orientation="horizontal"
             android:paddingLeft="16dp"
             android:paddingRight="16dp">
-
-
             <ImageView
-                android:id="@+id/toolbar_pen"
+                android:id="@+id/tool_insert"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:scaleType="center"
-                android:src="@drawable/tool_pen1a_layer" />
-
-            <ImageView
-                android:id="@+id/toolbar_color_px"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:scaleType="center"
-                android:src="@drawable/tool_t_black_layer" />
-
-            <ImageView
-                android:id="@+id/toolbar_clean"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:scaleType="center"
-                android:src="@drawable/tool_earser_layer" />
+                android:src="@drawable/tool_insert_image_layer" />
 
             <ImageView
                 android:id="@+id/tool_bg"
@@ -66,13 +48,15 @@
                 android:scaleType="center"
                 android:src="@drawable/tool_change_bg_layer" />
 
+
             <ImageView
-                android:id="@+id/tool_handorpen"
+                android:id="@+id/tool_play"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:scaleType="center"
-                android:src="@drawable/tool_usehand_layer" />
+                android:src="@drawable/tool_play_layer" />
+
 
             <ImageView
                 android:id="@+id/tool_recorder_record"
@@ -82,7 +66,21 @@
                 android:scaleType="center"
                 android:src="@drawable/tool_record_layer" />
 
+            <ImageView
+                android:id="@+id/tool_share"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:scaleType="center"
+                android:src="@drawable/tool_share_layer" />
+
         </LinearLayout>
     </LinearLayout>
-
+    <SeekBar
+        android:id="@+id/seekbar"
+        android:padding="10dp"
+        android:layout_alignParentBottom="true"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 </RelativeLayout>

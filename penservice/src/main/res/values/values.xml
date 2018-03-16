@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="close">关闭</string>
+    <string name="disconnect_device">断开设备</string>
+    <string name="notify_device_info">已连接 %1$s </string>
+    <string name="ota">正在进行OTA升级</string>
+    <string name="pen_service_busy">服务使用中无法断开</string>
+    <string name="robot_pen_service">罗博智慧笔服务</string>
+    <string name="robot_pen_service_ready_content">未连接罗博智能笔</string>
+    <string name="robot_pen_service_started">罗博智慧笔服务启动</string>
+    <string name="state_sync">正在同步数据</string>
+    <string name="usb_permission_diny">USB授权禁止</string>
+</resources>

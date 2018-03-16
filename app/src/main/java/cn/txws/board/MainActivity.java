@@ -19,8 +19,10 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -71,6 +73,7 @@ public class MainActivity extends RobotPenActivity implements BlockLoaderData.Bl
 
     public final static String EXTRA_BLOCKID = "EXTRA_BLOCKID";
     public final static String ACTION_DELBOARD = "action_delboard";
+    public static String EXTRA_ISNEW="extra_isnew";
     DelBroadcastReceiver mDelBroadcastReceiver;
     IntentFilter mIntentFilter;
     TrailsManageModule mTrailsManageModule;
@@ -160,6 +163,7 @@ public class MainActivity extends RobotPenActivity implements BlockLoaderData.Bl
             @Override
             public void onClick(View v) {
                 mGridAdapter.allPickOrUnPick(allText);
+                refreshBottomLayout();
             }
         });
         getSupportActionBar().setCustomView(customBar);
@@ -231,10 +235,14 @@ public class MainActivity extends RobotPenActivity implements BlockLoaderData.Bl
     public void onClick(View v){
         switch (v.getId()){
             case R.id.bottom_delete:
+                showDeleteDialog();
                 break;
             case R.id.bottom_share:
+                AppUtil.sharePictruesString(this,mGridAdapter.getSelectorPictureList());
+                setSelectorMode(false);
                 break;
             case R.id.bottom_merge:
+                setSelectorMode(false);
                 break;
         }
     }
@@ -261,12 +269,38 @@ public class MainActivity extends RobotPenActivity implements BlockLoaderData.Bl
         popupMenu.showPopupWindow(moreView);
     }
 
+
+    public void showDeleteDialog(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        builder.setTitle(R.string.delete_title);    //设置对话框标题
+        builder.setMessage(R.string.delete_message);
+        builder.setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String[] blocks=null;
+                mGridAdapter.getSelectorList().toArray(blocks);
+                deleteBlocks(blocks);
+                setSelectorMode(false);
+            }
+        });
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+        builder.setCancelable(true);    //设置按钮是否可以按返回键取消,false则不可以取消
+        AlertDialog dialog = builder.create();  //创建对话框
+        dialog.setCanceledOnTouchOutside(true); //设置弹出框失去焦点是否隐藏,即点击屏蔽其它地方是否隐藏
+        dialog.show();
+    }
+
     public void showRenameDialog(final String blockid) {
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
         builder.setTitle(R.string.rename);    //设置对话框标题
         final EditText edit = new EditText(MainActivity.this);
         builder.setView(edit);
-        builder.setPositiveButton("确认", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 if (edit.getText().toString() != null) {
@@ -274,7 +308,7 @@ public class MainActivity extends RobotPenActivity implements BlockLoaderData.Bl
                 }
             }
         });
-        builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
@@ -377,9 +411,20 @@ public class MainActivity extends RobotPenActivity implements BlockLoaderData.Bl
         }
     }
 
+    public void deleteBlocks(String[] delblocks) {
+        DeleteBlocksAction.deleteBlocks(delblocks);
+        for(int i=0;i<delblocks.length;i++) {
+            mTrailsManageModule.delBlock(delblocks[i]);
+        }
+    }
+
     public void deleteBlock(String delblock) {
         DeleteBlocksAction.deleteBlock(delblock);
-        mTrailsManageModule.delBlock(delblock);
+        try {
+            mTrailsManageModule.delBlock(delblock);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
 
@@ -388,6 +433,7 @@ public class MainActivity extends RobotPenActivity implements BlockLoaderData.Bl
         super.onActivityResult(requestCode, resultCode, data);
 
     }
+
 
 
     GridViewAdapter.OnItemClickListner itemClickListener = new GridViewAdapter.OnItemClickListner() {
@@ -407,8 +453,9 @@ public class MainActivity extends RobotPenActivity implements BlockLoaderData.Bl
             Log.e("=======gotoNewRecordBoardActivity============", "blockid=null");
             return;
         }
-        Intent intent = new Intent(MainActivity.this, NewRecordBoardActivity.class);
-        intent.putExtra(EXTRA_BLOCKID, blockid);
+        Intent intent = new Intent(MainActivity.this, RecordBoardActivity.class);
+        intent.putExtra(EXTRA_BLOCKID,blockid);
+        intent.putExtra(EXTRA_ISNEW,true);
         startActivityForResult(intent, 0);
     }
 
@@ -418,8 +465,9 @@ public class MainActivity extends RobotPenActivity implements BlockLoaderData.Bl
             return;
         }
         Intent intent = new Intent(MainActivity.this, RecordBoardActivity.class);
-        intent.putExtra(EXTRA_BLOCKID, blockid);
-        startActivityForResult(intent, 0);
+        intent.putExtra(EXTRA_BLOCKID,blockid);
+        intent.putExtra(EXTRA_ISNEW,false);
+        startActivityForResult(intent,0);
     }
 
 

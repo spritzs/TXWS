@@ -1,1 +1,1 @@
-include ':app', ':robotview_lib', 'robotrecord_lib', 'robotfile_lib'
+include ':app', ':robotview_lib', ':penservice', ':robotpenmodel_lib', 'robotrecord_lib', 'robotfile_lib'
