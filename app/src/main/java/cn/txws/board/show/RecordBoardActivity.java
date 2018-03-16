@@ -157,7 +157,7 @@ public class RecordBoardActivity extends RobotPenActivity
         recordBoardView.setLoadIgnorePhoto(false);
         recordBoardView.setDataSaveDir(ResUtils.getSavePath(ResUtils.DIR_NAME_DATA));
         recordBoardView.setIsTouchSmooth(true);
-        recordBoardView.setShowRecordDialog(false);
+        recordBoardView.setShowRecordDialog(true);
 		isNew=getIntent().getBooleanExtra(MainActivity.EXTRA_ISNEW,false);
         mCurrentID=getIntent().getStringExtra(MainActivity.EXTRA_BLOCKID);
 
@@ -201,10 +201,6 @@ public class RecordBoardActivity extends RobotPenActivity
         }
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-//        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-    }
 
     @Override
     public void onDestroy() {
@@ -234,14 +230,14 @@ public class RecordBoardActivity extends RobotPenActivity
             String savePath=null;
             if(ContextCompat.checkSelfPermission(this, "android.permission.WRITE_EXTERNAL_STORAGE") != 0) {
                 if(ActivityCompat.shouldShowRequestPermissionRationale((Activity)this, "android.permission.WRITE_EXTERNAL_STORAGE")) {
-                    Toast.makeText(this, cn.robotpen.record.R.string.robotpen_permission_request, 0).show();
+                    Toast.makeText(this, cn.robotpen.record.R.string.robotpen_permission_request, Toast.LENGTH_SHORT).show();
                 }
 
                 ActivityCompat.requestPermissions(this, new String[]{"android.permission.WRITE_EXTERNAL_STORAGE"}, 16);
             } else {
                 savePath = AppUtil.SAVEDIR + mCurrentID + ".jpg";
                 if (FileUtils.saveBitmap(loadBitmapFromView(recordBoardView), savePath)) {
-                    Log.e("======saveBitmap============","保存成功"+mCurrentID);
+                    Log.e("====saveBitmap======","2保存成功"+mCurrentID);
                 }
             }
             InsertNewOrUpdateBlockAction.InsertNewOrUpdateBlock("随笔"+String.valueOf(mTrailsManageModule.getBlockCount()-1),mCurrentID,savePath,System.currentTimeMillis());
@@ -349,7 +345,6 @@ public class RecordBoardActivity extends RobotPenActivity
                 showCleanDialog();
                 break;
             case R.id.toolbar_last:
-                Log.e("=======last==========",""+mOriginEntitys.size());
                 try {
                     isEdit = true;
                     isTailsEdit=0;
@@ -415,8 +410,9 @@ public class RecordBoardActivity extends RobotPenActivity
                 } else if (butFlag == 1) {// 点击暂停按钮
                     butFlag = 0;// 可以继续
                     mToolRecordPlay.setImageResource(R.drawable.tool_record_layer);
-                    recordBoardView.setIsPause(true);
-                    showRecordDialog();
+                    recordBoardView.endRecord();
+//                    recordBoardView.setIsPause(true);
+//                    showRecordDialog();
                 }
                 break;
             case R.id.tool_play:
