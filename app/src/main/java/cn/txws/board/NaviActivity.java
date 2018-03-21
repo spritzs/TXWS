@@ -31,7 +31,7 @@ public class NaviActivity extends AppCompatActivity {
                     startActivity(intent);
                     finish();
                 }
-            },2000);
+            },1000);
         }else{
             Intent intent = new Intent(NaviActivity.this, MainActivity.class);
             startActivity(intent);

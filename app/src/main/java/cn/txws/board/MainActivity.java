@@ -12,6 +12,7 @@ import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.RemoteException;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
@@ -20,6 +21,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -35,6 +38,8 @@ import butterknife.OnClick;
 import cn.robotpen.model.entity.note.NoteEntity;
 import cn.robotpen.model.symbol.DeviceType;
 import cn.robotpen.pen.callback.RobotPenActivity;
+import cn.robotpen.pen.model.RemoteState;
+import cn.robotpen.pen.model.RobotDevice;
 import cn.robotpen.utils.log.CLog;
 import cn.robotpen.views.module.TrailsManageModule;
 import cn.robotpen.views.widget.WhiteBoardView;
@@ -70,6 +75,7 @@ public class MainActivity extends RobotPenActivity implements BlockLoaderData.Bl
     TextView bottomShare;
     @BindView(R.id.bottom_merge)
     TextView bottomMerge;
+    RobotDevice mRobotDevice;//连接上的设备
 
     public final static String EXTRA_BLOCKID = "EXTRA_BLOCKID";
     public final static String ACTION_DELBOARD = "action_delboard";
@@ -200,9 +206,11 @@ public class MainActivity extends RobotPenActivity implements BlockLoaderData.Bl
             backSettingImg.setImageResource(R.drawable.ic_toolbar_quicksettings);
             allText.setVisibility(View.INVISIBLE);
             bluetoothImg.setVisibility(View.VISIBLE);
-            syncImg.setVisibility(View.VISIBLE);
             mFab.setVisibility(View.VISIBLE);
             bottomLayout.setVisibility(View.GONE);
+            syncImg.setVisibility(View.VISIBLE);
+
+
         }
     }
 
@@ -398,7 +406,9 @@ public class MainActivity extends RobotPenActivity implements BlockLoaderData.Bl
     }
 
     public void syncOffLine() {
-
+        syncImg.clearAnimation();
+        Animation animation= AnimationUtils.loadAnimation(this,R.anim.rotate_anim);
+        syncImg.startAnimation(animation);
     }
 
 
@@ -548,6 +558,9 @@ public class MainActivity extends RobotPenActivity implements BlockLoaderData.Bl
 //
 //                break;
 //        }
+
+
+
         return true;
     }
 
@@ -571,35 +584,25 @@ public class MainActivity extends RobotPenActivity implements BlockLoaderData.Bl
     @Override
     public void onServiceConnected(ComponentName name, IBinder service) {
         super.onServiceConnected(name, service);
-//        checkDeviceConn();
+        checkDeviceConn();
     }
 
-//    public void checkDeviceConn() {
-//        if (getPenServiceBinder() != null) {
-//            try {
-//                RobotDevice device = getPenServiceBinder().getConnectedDevice();
-//                if (device != null) {
-//                    DeviceType type = DeviceType.toDeviceType(device.getDeviceVersion());
-//                    mWhiteBoardView.setIsTouchWrite(false);
-//                    //判断当前设备与笔记设备是否一致
-//                    if (mWhiteBoardView.getFrameSizeObject().getDeviceType() != type) {
-//                        mDeDeviceType = type;
-//                        mNoteKey = NoteEntity.KEY_NOTEKEY_TMP + "_" + mDeDeviceType.name();
-//                    }
-//                }
-//                else {
-//                    mWhiteBoardView.setIsTouchWrite(false);
-//                }
-//            } catch (RemoteException e) {
-//                e.printStackTrace();
-//            }
-//        }
-//        else {
-//            mWhiteBoardView.setIsTouchWrite(false);
-//        }
-//        //都需要刷新白板
-//        mWhiteBoardView.initDrawArea();
-//    }
+    public void checkDeviceConn() {
+        if (getPenServiceBinder() != null) {
+            RobotDevice robotDevice = null;
+            try {
+                robotDevice = getPenServiceBinder().getConnectedDevice();
+                if (null != robotDevice) {
+                    mRobotDevice = robotDevice;
+                    syncImg.setEnabled(true);
+                }else{
+                    syncImg.setEnabled(false);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
 
     @Override
@@ -659,17 +662,7 @@ public class MainActivity extends RobotPenActivity implements BlockLoaderData.Bl
 
     @Override
     public void onStateChanged(int i, String s) {
-//        switch (i) {
-//            case RemoteState.STATE_CONNECTED:
-//                break;
-//            case RemoteState.STATE_DEVICE_INFO: //当出现设备切换时获取到新设备信息后执行的
-//                mWhiteBoardView.setIsTouchWrite(false);// 设备连接成功，改为用笔输入
-//                checkDeviceConn();
-//                break;
-//            case RemoteState.STATE_DISCONNECTED://设备断开
-//                mWhiteBoardView.setIsTouchWrite(false);// 设备断开，允许用手输入
-//                break;
-//        }
+
     }
 
 }

@@ -20,7 +20,6 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.provider.MediaStore;
-import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
@@ -30,16 +29,12 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.TranslateAnimation;
-import android.widget.AdapterView;
-import android.widget.EditText;
-import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -63,7 +58,6 @@ import cn.robotpen.views.widget.WhiteBoardView;
 import cn.txws.board.MainActivity;
 import cn.txws.board.MyApplication;
 import cn.txws.board.R;
-import cn.txws.board.adapter.ColorGridViewAdapter;
 import cn.txws.board.common.ResUtils;
 import cn.txws.board.database.action.InsertNewOrUpdateBlockAction;
 import cn.txws.board.util.AppUtil;
@@ -108,7 +102,7 @@ public class RecordBoardActivity extends RobotPenActivity
     @BindView(R.id.seekbar)
     SeekBar mSeekbar;
 
-    ImageView mToolHandOrPen,mPen,mToolColorPicker;
+    ImageView mToolHandOrPen,mPen,mToolColorPicker,mClean;
     boolean isFirst=true;
     int isTailsEdit=0;
 
@@ -129,6 +123,7 @@ public class RecordBoardActivity extends RobotPenActivity
         mToolHandOrPen= (ImageView) customBar.findViewById(R.id.toolbar_handorpen);
         mPen= (ImageView) customBar.findViewById(R.id.toolbar_pen);
         mToolColorPicker= (ImageView) customBar.findViewById(R.id.toolbar_color_px);
+        mClean= (ImageView) customBar.findViewById(R.id.toolbar_clean);
 
 
         getSupportActionBar().setCustomView(customBar);
@@ -334,11 +329,10 @@ public class RecordBoardActivity extends RobotPenActivity
                 }
                 break;
             case R.id.toolbar_pen:
-//                List<TrailsEntity> list=mTrailsManageModule.getTrails(mCurrentID);
-
+                showPenPixelPop();
                 break;
             case R.id.toolbar_color_px:
-                showColorPixelDialog();
+                showColorDialog();
                 isRubber=0;
                 break;
             case R.id.toolbar_clean:
@@ -425,6 +419,24 @@ public class RecordBoardActivity extends RobotPenActivity
         }
     }
 
+    Integer[] pixelSum=new Integer[]{R.drawable.toolbar_1px_pen, R.drawable.toolbar_2px_pen, R.drawable.toolbar_4px_pen, R.drawable.toolbar_8px_pen};
+    Integer[] pixelToolBar=new Integer[]{R.drawable.toolbar_1px_pen_layer, R.drawable.toolbar_2px_pen_layer, R.drawable.toolbar_4px_pen_layer, R.drawable.toolbar_8px_pen_layer};
+    Integer[] pixelSelectorSum=new Integer[]{1,2,4,8};
+
+    public void showPenPixelPop(){
+        final ToolbarPopupMenu popupMenu=new ToolbarPopupMenu(this, pixelSum);
+        popupMenu.setOnItemClickListener(new ToolbarPopupMenu.OnItemClickListener() {
+            @Override
+            public void onItemClick(int postion) {
+                mPenWeight=pixelSelectorSum[postion];
+                mPen.setImageResource(pixelToolBar[postion]);
+                popupMenu.dismiss();
+            }
+        });
+        popupMenu.showPop(mPen);
+        isRubber=0;
+    }
+
     public void showRecordDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(RecordBoardActivity.this);
         builder.setTitle(R.string.save_video);    //设置对话框标题
@@ -454,100 +466,39 @@ public class RecordBoardActivity extends RobotPenActivity
 
 
 
-    Integer[] colorSum=new Integer[]{R.drawable.tool_picker_black_selector,R.drawable.tool_picker_blue_selector,R.drawable.tool_picker_brown_selector,R.drawable.tool_picker_green_selector,R.drawable.tool_picker_green2_selector,R.drawable.tool_picker_yellow1_selector,R.drawable.tool_picker_violet_selector,R.drawable.tool_picker_red_selector,R.drawable.tool_picker_red1_selector,R.drawable.tool_picker_yellow2_selector,R.drawable.tool_picker_yellow_selector,R.drawable.tool_picker_white_selector};
-    Integer[] colorToolBar=new Integer[]{R.drawable.tool_t_black_layer,R.drawable.tool_t_blue_layer,R.drawable.tool_t_brown_layer,R.drawable.tool_t_green_layer,R.drawable.tool_t_green2_layer,R.drawable.tool_t_yellow1_layer,R.drawable.tool_t_violet_layer,R.drawable.tool_t_red_layer,R.drawable.tool_t_red1_layer,R.drawable.tool_t_yellow2_layer,R.drawable.tool_t_yellow_layer,R.drawable.tool_t_white_layer};
-    ColorGridViewAdapter mColorGridAapter;
-    AlertDialog mDialog;
-
-    public void showColorPixelDialog(){
-        View view=LayoutInflater.from(this).inflate(R.layout.colorpixel_dialog,null);
-        GridView gird= (GridView) view.findViewById(R.id.grid);
-        SeekBar seekBar= (SeekBar) view.findViewById(R.id.seek);
-        final TextView textView= (TextView) view.findViewById(R.id.text);
-        seekBar.setMax(20);
-        seekBar.setProgress((int)mPenWeight);
-        textView.setText(getString(R.string.tool_pen_pixels)+((int)mPenWeight)+"px");
-        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+    Integer[] colorSum=new Integer[]{R.drawable.tool_picker_black_selector,R.drawable.tool_picker_blue_selector,R.drawable.tool_picker_green2_selector,R.drawable.tool_picker_violet_selector,R.drawable.tool_picker_red_selector,R.drawable.tool_picker_red1_selector,R.drawable.tool_picker_yellow2_selector/*,R.drawable.tool_picker_white_selector*/};
+    Integer[] colorToolBar=new Integer[]{R.drawable.tool_t_black_layer,R.drawable.tool_t_blue_layer,R.drawable.tool_t_green2_layer,R.drawable.tool_t_violet_layer,R.drawable.tool_t_red_layer,R.drawable.tool_t_red1_layer,R.drawable.tool_t_yellow2_layer/*,R.drawable.tool_t_white_layer*/};
+    Integer[] colorSelectorSum=new Integer[]{0xFF000000,0xFF3b68b9,0xFF96d0a7,0xFF763aab,0xFFf04f54,0xFFf48a94,0xFFf7d91e/*,0xFFFFFFFF*/};
+    public void showColorDialog(){
+        final ToolbarPopupMenu popupMenu=new ToolbarPopupMenu(this, colorSum);
+        popupMenu.setOnItemClickListener(new ToolbarPopupMenu.OnItemClickListener() {
             @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                mPenWeight=Math.max(2,progress);
-                textView.setText(getString(R.string.tool_pen_pixels)+((int)mPenWeight)+"px");
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
+            public void onItemClick(int postion) {
+                mPenColor=colorSelectorSum[postion];
+                mToolColorPicker.setImageResource(colorToolBar[postion]);
+                popupMenu.dismiss();
             }
         });
-
-
-        mColorGridAapter=new ColorGridViewAdapter(this,colorSum);
-
-        mColorGridAapter.setSelecterColor(mPenColor);
-
-        mToolColorPicker.setImageResource(colorToolBar[mColorGridAapter.getSelecterItem()]);
-        gird.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                mColorGridAapter.setSelecterItem(position);
-                mPenColor=mColorGridAapter.getSelecterColor();
-            }
-        });
-        gird.setAdapter(mColorGridAapter);
-        mDialog=new AlertDialog.Builder(RecordBoardActivity.this).setView(view).setCancelable(true).setTitle(R.string.colorpixel_dialog_title).setPositiveButton("确定", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                mDialog.dismiss();
-            }
-        }).show();
-        mDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-            @Override
-            public void onDismiss(DialogInterface dialog) {
-                mToolColorPicker.setImageResource(colorToolBar[mColorGridAapter.getSelecterItem()]);
-            }
-        });
+        popupMenu.showPop(mToolColorPicker);
+        isRubber=0;
     }
 
-    int saveRubber=50;
+    Integer[] cleanSum=new Integer[]{R.drawable.earser_small,R.drawable.earser,R.drawable.tool_clean};
+    Integer[] cleanSelectorSum=new Integer[]{50,200,0};
     public void showCleanDialog(){
-        View view=LayoutInflater.from(this).inflate(R.layout.clean_dialog,null);
-        SeekBar seekBar= (SeekBar) view.findViewById(R.id.seek);
-        final TextView textView= (TextView) view.findViewById(R.id.text);
-        isRubber=saveRubber;
-        seekBar.setMax(10);
-        seekBar.setProgress(saveRubber/50);
-        textView.setText(getString(R.string.tool_earser_pixels)+(saveRubber)+"px");
-        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+        final ToolbarPopupMenu popupMenu=new ToolbarPopupMenu(this, cleanSum);
+        popupMenu.setOnItemClickListener(new ToolbarPopupMenu.OnItemClickListener() {
             @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                saveRubber=progress*50;
-                isRubber=saveRubber;
-                textView.setText(getString(R.string.tool_pen_pixels)+(saveRubber)+"px");
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
+            public void onItemClick(int postion) {
+                if(postion==2){
+                    recordBoardView.cleanScreen();
+                    recordBoardView.startPhotoEdit(false);// 退出图片编辑模式，否则此时点击图平铺会崩溃
+                }
+                isRubber=cleanSelectorSum[postion];
+                popupMenu.dismiss();
             }
         });
-
-        mDialog=new AlertDialog.Builder(RecordBoardActivity.this).setView(view).setCancelable(true).setTitle(R.string.earser_dialog_title).setPositiveButton("确定", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                mDialog.dismiss();
-            }
-        }).show();
-
+        popupMenu.showPop(mClean);
     }
 
 

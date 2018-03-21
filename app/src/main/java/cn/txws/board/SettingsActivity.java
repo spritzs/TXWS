@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import butterknife.BindView;
@@ -42,7 +43,9 @@ public class SettingsActivity extends RobotPenActivity {
     TextView mTextVersion;
     @BindView(R.id.conn_status)
     TextView mTextConnStatus;
-
+    RobotDevice mRobotDevice;//连接上的设备
+    MenuItem syncItem;
+    ImageView syncImg;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -69,6 +72,8 @@ public class SettingsActivity extends RobotPenActivity {
             case R.id.bluetooth_settings:
                 connectBlueTooth();
                 break;
+            case R.id.sync_settings:
+                break;
 
             default:
                 break;
@@ -79,6 +84,7 @@ public class SettingsActivity extends RobotPenActivity {
 
     public void init() {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         mTextVersion.setText("v"+getVerName(this));
     }
 
@@ -134,16 +140,28 @@ public class SettingsActivity extends RobotPenActivity {
                 break;
             case RemoteState.STATE_CONNECTING:
                 break;
-            case RemoteState.STATE_DISCONNECTED: //设备断开
-                Log.e("test", "STATE_DISCONNECTED");
-                mTextConnStatus.setText(R.string.no_connect);
+            case RemoteState.STATE_DEVICE_INFO: //当出现设备切换时获取到新设备信息后执行的
+                RobotDevice robotDevice = null;
+                try {
+                    robotDevice = getPenServiceBinder().getConnectedDevice();
+                    if (null != robotDevice) {
+                        mRobotDevice = robotDevice;
+                        syncImg.setEnabled(true);
+                    }else{
+                        mRobotDevice=null;
+                    }
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+
                 break;
-            case RemoteState.STATE_DEVICE_INFO: //设备连接成功状态
-                Log.e("test", "STATE_DEVICE_INFO");
-                checkDevice();
+            case RemoteState.STATE_DISCONNECTED://设备断开
+                mRobotDevice=null;
+                syncImg.clearAnimation();
+                syncImg.setEnabled(false);
                 break;
             case RemoteState.STATE_ENTER_SYNC_MODE_SUCCESS://笔记同步成功
-
+                syncImg.setEnabled(false);
                 break;
         }
     }

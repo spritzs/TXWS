@@ -36,7 +36,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:scaleType="center"
-            android:src="@drawable/tool_pen1a_layer" />
+            android:src="@drawable/toolbar_2px_pen_layer" />
 
         <ImageView
             android:id="@+id/toolbar_color_px"

@@ -24,7 +24,7 @@
         android:layout_height="wrap_content" />
     <ImageView
         android:id="@+id/toolbar_sync"
-        android:src="@drawable/ic_toolbar_sync"
+        android:src="@drawable/sync_selector"
         android:layout_centerVertical="true"
         android:background="?selectableItemBackgroundBorderless"
         android:layout_alignParentRight="true"

@@ -14,6 +14,6 @@
         android:orderInCategory="100"
         app:showAsAction="always"
         android:title="@string/sync_button"
-        android:icon="@drawable/ic_toolbar_sync"
+        android:icon="@drawable/sync_selector"
          />
 </menu>
