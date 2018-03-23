@@ -60,6 +60,7 @@ import cn.robotpen.pen.model.RobotDevice;
 import cn.robotpen.pen.scan.RobotScanCallback;
 import cn.robotpen.utils.log.CLog;
 import cn.txws.board.R;
+import cn.txws.board.util.AppUtil;
 
 
 public class BleConnectActivity extends RobotPenActivity {
@@ -268,12 +269,6 @@ public class BleConnectActivity extends RobotPenActivity {
         Log.e("test", "onServiceConnected");
         checkDevice();//检测设备如果连接过则自动连接
     }
-
-    /**
-     * 检测设备连接 如果本次连接的是P1则禁止使用如果本次连接的是蓝牙设备则不处理
-     * 如果本次未连接但上次已连接蓝牙设备则直接连接
-     * 只有在onServiceConnected之后robotService才可以正常使用
-     **/
     private void checkDevice() {
         try {
             RobotDevice robotDevice = getPenServiceBinder().getConnectedDevice(); //获取目前连接的设备
@@ -489,6 +484,7 @@ public class BleConnectActivity extends RobotPenActivity {
                     //结束点
                     num++;
                     Log.v("Sync", String.format("第%d笔,共%d个点", num, points.size()));
+                    AppUtil.putDevicePoints(points);
                     points.clear();
                 } else {
                     points.add(point);

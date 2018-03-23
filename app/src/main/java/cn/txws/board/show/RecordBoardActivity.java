@@ -41,6 +41,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import cn.robotpen.model.DevicePoint;
 import cn.robotpen.model.entity.SettingEntity;
 import cn.robotpen.model.entity.note.NoteEntity;
 import cn.robotpen.model.entity.note.TrailsEntity;
@@ -161,6 +162,7 @@ public class RecordBoardActivity extends RobotPenActivity
 
 
 
+
     public void init(){
         initActionBar();
     }
@@ -271,6 +273,7 @@ public class RecordBoardActivity extends RobotPenActivity
             try {
                 RobotDevice device = getPenServiceBinder().getConnectedDevice();
                 if (device != null) {
+                    Log.e("===checkDeviceConn======", "device:"+device.getName());
                     recordBoardView.setIsTouchWrite(false);
                     DeviceType type = DeviceType.toDeviceType(device.getDeviceVersion());
                     //判断当前设备与笔记设备是否一致
@@ -280,6 +283,7 @@ public class RecordBoardActivity extends RobotPenActivity
                     }
                 }else {
                     recordBoardView.setIsTouchWrite(true);
+                    Log.e("===checkDeviceConn======", "device:null");
                 }
             } catch (RemoteException e) {
                 e.printStackTrace();
@@ -289,7 +293,7 @@ public class RecordBoardActivity extends RobotPenActivity
         }
         //都需要刷新白板
         recordBoardView.initDrawArea();
-
+        mToolHandOrPen.setImageResource(recordBoardView.isTouchWrite()?R.drawable.tool_usehand_layer:R.drawable.tool_usepen_layer);
     }
 
 
@@ -313,7 +317,7 @@ public class RecordBoardActivity extends RobotPenActivity
         }else{
             recordBoardView.setBackgroundResource(R.drawable.note_bg_noshade);
         }
-        mToolHandOrPen.setImageResource(recordBoardView.isTouchWrite()?R.drawable.tool_usehand_layer:R.drawable.tool_usepen_layer);
+
     }
 
     @OnClick({R.id.tool_insert,R.id.tool_bg,R.id.tool_play,R.id.tool_recorder_record,R.id.tool_share})
@@ -646,6 +650,9 @@ public class RecordBoardActivity extends RobotPenActivity
                     recordBoardView.toBlock(mCurrentID);
                     mOriginEntitys=mTrailsManageModule.getTrails(mCurrentID);
                     isFirst=false;
+                    if(AppUtil.getDevicePoints().size()>0){
+                        showSyncDialog();
+                    }
                 }
                 break;
             case BOARD_AREA_COMPLETE: //白板区域加载完成
@@ -754,7 +761,7 @@ public class RecordBoardActivity extends RobotPenActivity
                 break;
             case RemoteState.STATE_DEVICE_INFO: //当出现设备切换时获取到新设备信息后执行的
                 recordBoardView.setIsTouchWrite(false);
-//                checkDeviceConn();
+                checkDeviceConn();
                 break;
             case RemoteState.STATE_DISCONNECTED://设备断开
                 recordBoardView.setIsTouchWrite(true);
@@ -764,12 +771,13 @@ public class RecordBoardActivity extends RobotPenActivity
 
     @Override
     public void onPenServiceError(String s) {
-
+        Log.e("=====onPenServiceError=========",s);
     }
 
     @Override
     public void onPenPositionChanged(int deviceType, int x, int y, int presure, byte state) {
         super.onPenPositionChanged(deviceType, x, y, presure, state);
+        Log.e("=====onPenPositionChanged=========","onPenPositionChanged:x:"+x+".y:"+y);
         if(isRubber==0) {// isRubber==0  现在没用橡皮察，止选择橡皮擦的时候，不小心触碰笔，绘制笔迹。
 //            DevicePoint p = DevicePoint.obtain(deviceType, x, y, presure, state);
 //            recordBoardView.drawLine(p);
@@ -869,12 +877,60 @@ public class RecordBoardActivity extends RobotPenActivity
         Bitmap bmp = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(bmp);
 
-//        c.drawColor(Color.WHITE);
         /** 如果不设置canvas画布为白色，则生成透明 */
 
         v.layout(0, 0, w, h);
         v.draw(c);
         v.destroyDrawingCache();
         return bmp;
+    }
+
+
+    public void showSyncDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(RecordBoardActivity.this);
+        builder.setTitle(R.string.sync_title);    //设置对话框标题
+        builder.setMessage(R.string.sync_message);    //设置对话框标题
+        builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                isEdit=true;
+                syncNote();
+            }
+        });
+        builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+        builder.setCancelable(true);    //设置按钮是否可以按返回键取消,false则不可以取消
+        AlertDialog dialog = builder.create();  //创建对话框
+        dialog.setCanceledOnTouchOutside(true); //设置弹出框失去焦点是否隐藏,即点击屏蔽其它地方是否隐藏
+        dialog.show();
+    }
+
+    /**
+     * 同步笔记
+     */
+    public void syncNote(){
+        for(List<DevicePoint> points:AppUtil.getDevicePoints()) {
+            int i=0;
+            for (DevicePoint point:points){
+                byte t;
+                if (point.isLeave()) {
+                    t = DevicePoint.POINT_STATE_LEAVE;
+                } else if (point.isRoute()) {
+                    t = DevicePoint.POINT_STATE_DOWN;
+                } else {
+                    t = DevicePoint.POINT_STATE_UP;
+                }
+                if(i==points.size()-1){
+                    t = DevicePoint.POINT_STATE_LEAVE;
+                }
+                i++;
+                recordBoardView.drawDevicePoint(point.getDeviceType(), (int) point.getOriginalX(), (int) point.getOriginalY(), (int) point.getPressureValue(), t);
+            }
+        }
+        AppUtil.getDevicePoints().clear();
     }
 }

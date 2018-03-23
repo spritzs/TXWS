@@ -36,4 +36,6 @@
     <string name="delete_title">删除</string>
     <string name="confirm">确认</string>
     <string name="cancel">取消</string>
+    <string name="sync_title">同步数据</string>
+    <string name="sync_message">有同步数据，是否保存到本画板？</string>
 </resources>

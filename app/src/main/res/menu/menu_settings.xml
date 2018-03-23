@@ -12,7 +12,7 @@
     <item
         android:id="@+id/sync_settings"
         android:orderInCategory="100"
-        app:showAsAction="always"
+        android:visible="false"
         android:title="@string/sync_button"
         android:icon="@drawable/sync_selector"
          />

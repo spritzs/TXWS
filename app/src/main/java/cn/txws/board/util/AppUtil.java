@@ -28,10 +28,22 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.robotpen.model.DevicePoint;
 import cn.txws.board.R;
 
 public class AppUtil {
     public final static String SAVEDIR = Environment.getExternalStorageDirectory()+ "/cn.txws.board/photo/";
+    private static List<List<DevicePoint>> mDevicePoints = new ArrayList<>();
+
+    public static List<List<DevicePoint>> getDevicePoints(){
+        return mDevicePoints;
+    }
+    public static void putDevicePoints(List<DevicePoint> devicePoints){
+//        mDevicePoints.clear();
+        List<DevicePoint> array=new ArrayList<>();
+        array.addAll(devicePoints);
+        mDevicePoints.add(array);
+    }
 
     public static void sharePictrue(Context context,String path) {
         Intent intent=new Intent(Intent.ACTION_SEND);

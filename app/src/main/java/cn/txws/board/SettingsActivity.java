@@ -130,7 +130,7 @@ public class SettingsActivity extends RobotPenActivity {
 
     @Override
     public void onStateChanged(int state, String addr) {
-        Log.e("test", "onStateChanged");
+        Log.e("===========test================", "onStateChanged");
         switch (state) {
             case RemoteState.STATE_ERROR:
                 Log.w("test", "STATE_ERROR");
@@ -146,9 +146,10 @@ public class SettingsActivity extends RobotPenActivity {
                     robotDevice = getPenServiceBinder().getConnectedDevice();
                     if (null != robotDevice) {
                         mRobotDevice = robotDevice;
-                        syncImg.setEnabled(true);
+//                        syncImg.setEnabled(true);
                     }else{
                         mRobotDevice=null;
+//                        syncImg.setEnabled(false);
                     }
                 } catch (RemoteException e) {
                     e.printStackTrace();
@@ -157,20 +158,27 @@ public class SettingsActivity extends RobotPenActivity {
                 break;
             case RemoteState.STATE_DISCONNECTED://设备断开
                 mRobotDevice=null;
-                syncImg.clearAnimation();
-                syncImg.setEnabled(false);
+//                syncImg.clearAnimation();
+//                syncImg.setEnabled(false);
                 break;
             case RemoteState.STATE_ENTER_SYNC_MODE_SUCCESS://笔记同步成功
-                syncImg.setEnabled(false);
+//                syncImg.setEnabled(false);
                 break;
         }
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        if(getPenServiceBinder()!=null)
+            checkDevice();//检测设备是否连接
+    }
+
+    @Override
     public void onServiceConnected(ComponentName name, IBinder service) {
         super.onServiceConnected(name, service);
-        Log.e("test", "onServiceConnected");
-        checkDevice();//检测设备是否连接
+        if(getPenServiceBinder()!=null)
+            checkDevice();//检测设备是否连接
     }
 
     private void checkDevice() {

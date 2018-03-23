@@ -20,21 +20,22 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import cn.robotpen.model.DevicePoint;
 import cn.robotpen.model.entity.note.NoteEntity;
 import cn.robotpen.model.symbol.DeviceType;
 import cn.robotpen.pen.callback.RobotPenActivity;
@@ -56,6 +57,7 @@ import cn.txws.board.show.BoardPopupMenu;
 import cn.txws.board.show.NewRecordBoardActivity;
 import cn.txws.board.show.RecordBoardActivity;
 import cn.txws.board.util.AppUtil;
+import cn.txws.board.util.ThreadUtil;
 
 public class MainActivity extends RobotPenActivity implements BlockLoaderData.BlockLoaderDataListener, WhiteBoardInterface {
 
@@ -89,8 +91,6 @@ public class MainActivity extends RobotPenActivity implements BlockLoaderData.Bl
             .createBinding(this);
 
     GridViewAdapter mGridAdapter;
-
-    boolean isDel = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -209,8 +209,6 @@ public class MainActivity extends RobotPenActivity implements BlockLoaderData.Bl
             mFab.setVisibility(View.VISIBLE);
             bottomLayout.setVisibility(View.GONE);
             syncImg.setVisibility(View.VISIBLE);
-
-
         }
     }
 
@@ -360,6 +358,7 @@ public class MainActivity extends RobotPenActivity implements BlockLoaderData.Bl
     protected void onResume() {
         super.onResume();
         registerReceiver(mDelBroadcastReceiver, mIntentFilter);
+        checkDeviceConn();
     }
 
     @Override
@@ -406,9 +405,85 @@ public class MainActivity extends RobotPenActivity implements BlockLoaderData.Bl
     }
 
     public void syncOffLine() {
-        syncImg.clearAnimation();
-        Animation animation= AnimationUtils.loadAnimation(this,R.anim.rotate_anim);
-        syncImg.startAnimation(animation);
+        if(mRobotDevice!=null) {
+            checkStorageNoteNum(mRobotDevice);//同步笔记
+        }
+    }
+
+    @Override
+    public void onSyncProgress(String key, int total, int progress) {
+        super.onSyncProgress(key, total, progress);
+    }
+
+
+    @Override
+    public void onOffLineNoteSyncFinished(String json, byte[] data) {
+        super.onOffLineNoteSyncFinished(json, data);
+
+        if (mRobotDevice!=null&&data != null && data.length >= 5) {
+            int num = 0, step = 1;
+            List<DevicePoint> points = new ArrayList<>();
+            DeviceType type = DeviceType.toDeviceType(mRobotDevice.getDeviceVersion());
+            DevicePoint point;
+            for (int i = 0; i <= data.length - 5; i += step) {
+                try {
+                    point = new DevicePoint(type, data, i);
+                    step = 5;//5字节为一个点数据
+                } catch (Exception e) {
+                    step = 1;//查找下一个有效字节
+                    e.printStackTrace();
+                    continue;
+                }
+                if (point.isLeave()) {
+                    //结束点
+                    num++;
+                    Log.v("Sync", String.format("第%d笔,共%d个点", num, points.size()));
+                    AppUtil.putDevicePoints(points);
+                    points.clear();
+                } else {
+                    points.add(point);
+                }
+            }
+
+
+            ThreadUtil.getMainThreadHandler().post(new Runnable() {
+                @Override
+                public void run() {
+                    syncImg.clearAnimation();
+                    Toast.makeText(MainActivity.this, "共计同步了 " + AppUtil.getDevicePoints().size() + " 笔数据", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+    }
+
+    /**
+     * 检查存储笔记数
+     */
+    private void checkStorageNoteNum(RobotDevice device) {
+        int num = device.getOfflineNoteNum();
+        if (num > 0) {
+            AlertDialog.Builder alert = new AlertDialog.Builder(this);
+            alert.setTitle("提示");
+            alert.setMessage("共有" + num + "条数据可以同步！");
+            alert.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    try {
+                        syncImg.clearAnimation();
+                        Animation animation= AnimationUtils.loadAnimation(MainActivity.this,R.anim.rotate_anim);
+                        syncImg.startAnimation(animation);
+                        getPenServiceBinder().startSyncOffLineNote();
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    }
+                    dialog.dismiss();
+                }
+            });
+            alert.setNegativeButton("取消", null);
+            alert.show();
+        }else{
+            Toast.makeText(this, "已是最新数据", Toast.LENGTH_SHORT).show();
+        }
     }
 
 
@@ -546,21 +621,6 @@ public class MainActivity extends RobotPenActivity implements BlockLoaderData.Bl
 
     @Override
     public boolean onEvent(WhiteBoardView.BoardEvent boardEvent, Object o) {
-//        switch (boardEvent) {
-//            case BOARD_AREA_COMPLETE: //白板区域加载完成
-//                mWhiteBoardView.beginBlock();
-//                break;
-//            case ERROR_DEVICE_TYPE: //检测到连接设备更换
-//                break;
-//            case ERROR_SCENE_TYPE: //横竖屏更换
-//                break;
-//            case TRAILS_COMPLETE:
-//
-//                break;
-//        }
-
-
-
         return true;
     }
 
@@ -596,6 +656,7 @@ public class MainActivity extends RobotPenActivity implements BlockLoaderData.Bl
                     mRobotDevice = robotDevice;
                     syncImg.setEnabled(true);
                 }else{
+                    mRobotDevice=null;
                     syncImg.setEnabled(false);
                 }
             } catch (Exception e) {
@@ -662,7 +723,7 @@ public class MainActivity extends RobotPenActivity implements BlockLoaderData.Bl
 
     @Override
     public void onStateChanged(int i, String s) {
-
+        Log.e("========onStateChanged==========","onStateChanged"+s);
     }
 
 }
